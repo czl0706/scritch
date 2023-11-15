@@ -35,9 +35,11 @@ try:
             index += 1
             if index == int(INTERVAL/SAMPLING_PERIOD):
                 with torch.no_grad():
-                    print(model(torch.from_numpy(x)).item())
-                    # if model(torch.from_numpy(x)).item() > 0.5:
-                    #     print('Are you scratching?')
+                    # print(model(torch.from_numpy(x)).item())
+                    if model(torch.from_numpy(x)).item() > 0.5:
+                        print('Are you scratching?')
+                    else:
+                        print('Everything looks fine')
                 index = 0
 except KeyboardInterrupt:
     ser.close() 

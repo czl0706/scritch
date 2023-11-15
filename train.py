@@ -14,6 +14,7 @@ config = {
   "batch_size": 100,
   "learning_rate": 1e-5,
   'epochs': 1000,
+  'early_stop': 100,
   'save_path': './models'
 }
 
@@ -45,15 +46,15 @@ class ScritchData(Dataset):
     def __getitem__(self, idx):
         return self.inp_feat[idx], self.out_feat[idx]
     
-# full_dataset = ScritchData(['./data/data1.csv', './data/data2.csv', './data/data3.csv'])
-full_dataset = ScritchData(['./data/data_finger.csv'])
+full_dataset = ScritchData(['./data/data1.csv', './data/data2.csv', './data/data3.csv'])
+# full_dataset = ScritchData(['./data/data_finger.csv'])
 
-train_size = int(0.8 * len(full_dataset))
-valid_size = len(full_dataset) - train_size
-train_ds, valid_ds = torch.utils.data.random_split(full_dataset, [train_size, valid_size])
+# train_size = int(0.8 * len(full_dataset))
+# valid_size = len(full_dataset) - train_size
+train_ds, valid_ds = torch.utils.data.random_split(full_dataset, [0.8, 0.2])
 
 train_dl = DataLoader(train_ds, config["batch_size"], shuffle=True, drop_last=True, num_workers=0, pin_memory=True)
-val_dl = DataLoader(valid_ds, config["batch_size"], shuffle=True, drop_last=True, num_workers=0, pin_memory=True)
+valid_dl = DataLoader(valid_ds, config["batch_size"], shuffle=True, drop_last=True, num_workers=0, pin_memory=True)
   
 model = Scritch().to(config['device'])
 
@@ -112,7 +113,7 @@ for epoch in range(n_epochs):
     ######################
     model.eval()
     with torch.no_grad():
-        for batch_idx, item in enumerate(tqdm(val_dl)):
+        for batch_idx, item in enumerate(tqdm(valid_dl)):
             x, y = item
             x, y = x.to(device, non_blocking=True), y.to(device, non_blocking=True)
 
@@ -131,13 +132,13 @@ for epoch in range(n_epochs):
     # calculate average loss over an epoch
     train_loss = train_loss/len(train_dl.dataset)
     result['train_loss'] = train_loss
-    valid_loss = valid_loss/len(val_dl.dataset)
+    valid_loss = valid_loss/len(valid_dl.dataset)
     result['val_loss'] = valid_loss
     leaning_rate = lrs
     result['lrs'] = leaning_rate
     history.append(result)
 
-    valid_acc = (100. * valid_acc) / len(val_dl.dataset)
+    valid_acc = (100. * valid_acc) / len(valid_dl.dataset)
 
     print('Epoch {:2d}, lr: {:.6f} Train Loss: {:.6f} Valid Loss: {:.6f} Valid Acc: {:.2f}%'.format(
         epoch+1,
@@ -168,6 +169,6 @@ for epoch in range(n_epochs):
     else:
         early_stop_count += 1
 
-    if early_stop_count >= 100:
+    if early_stop_count >= config['early_stop']:
         print('\nModel is not improving, so we halt the training session.')
         break
