@@ -154,7 +154,7 @@ for epoch in range(n_epochs):
             valid_loss_min,
             valid_loss
         ))
-        torch.save(model.state_dict(), save_path + 'model.pt')
+        torch.save(model.state_dict(), os.path.join(save_path, 'model.pt'))
         valid_loss_min = valid_loss
         # print('Saving checkpoint...')
         # state = {

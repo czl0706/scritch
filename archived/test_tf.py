@@ -3,7 +3,7 @@ import tensorflow as tf
 import keras
 from serial_port import ser
 
-model = keras.models.load_model('./models/model.h5')
+model = keras.models.load_model('../models/model.h5')
 
 x = np.zeros((1, 200), dtype=np.float32)
 index = 0
