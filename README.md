@@ -1,18 +1,18 @@
 # scritch
 
-### Debugging on WSL 2
-First, install usbipd on host(Windows):   
+### Debugging esp-idf project on WSL 2
+First, install usbipd on the host(Windows):   
 ```pwsh
 $ winget install usbipd
 ```
 
-and WSL also.
+and the step on WSL:
 ```sh
 $ sudo apt install linux-tools-generic hwdata
 $ sudo update-alternatives --install /usr/local/bin/usbip usbip /usr/lib/linux-tools/*-generic/usbip 20
 ```
 
-List all the devices on host:
+List all the devices on the host:
 ```pwsh
 $ usbipd list
 ```
@@ -29,4 +29,29 @@ BUSID  VID:PID    DEVICE                                                        
 Attach the device to WSL:
 ```pwsh
 $ usbipd wsl attach --busid 1-2
+```
+
+Detach the device from WSL:
+```pwsh
+$ usbipd wsl detach --busid 1-2
+```
+
+### Collect data
+```pwsh
+$ python ./collect.py 
+```
+This program reads all the data transmitted from UART.
+
+### Modify model & Training 
+Open `model.py` and change the parameters.
+
+```pwsh
+$ python ./train.py 
+```
+Ensure that the pre-processing steps are implemented within the ScritchData dataset.
+
+### Testing
+Make sure that the pre-process procedure is consistent with the training steps.
+```pwsh
+$ python ./test.py
 ```
