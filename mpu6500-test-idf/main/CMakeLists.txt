@@ -1,2 +1,2 @@
-idf_component_register(SRCS "i2c_simple_main.c"
+idf_component_register(SRCS "mpu6500-test.c"
                     INCLUDE_DIRS ".")

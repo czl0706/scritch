@@ -19,8 +19,9 @@
 #include <stdio.h>
 #include "esp_log.h"
 #include "driver/i2c.h"
+#include "esp_timer.h"
 
-static const char *TAG = "i2c-mpu6500";
+static const char *TAG = "mpu6500-test";
 
 #define I2C_MASTER_SCL_IO           CONFIG_I2C_MASTER_SCL      /*!< GPIO number used for I2C master clock */
 #define I2C_MASTER_SDA_IO           CONFIG_I2C_MASTER_SDA      /*!< GPIO number used for I2C master data  */
@@ -29,16 +30,20 @@ static const char *TAG = "i2c-mpu6500";
 #define I2C_MASTER_TX_BUF_DISABLE   0                          /*!< I2C master doesn't need buffer */
 #define I2C_MASTER_RX_BUF_DISABLE   0                          /*!< I2C master doesn't need buffer */
 #define I2C_MASTER_TIMEOUT_MS       1000
+#define I2C_INTERNAL_PULLUP         false                       // Set to false if external pull-up resistor is used 
 
 #define MPU6500_SENSOR_ADDR                 0x68        /*!< Slave address of the MPU6500 sensor */
 #define MPU6500_WHO_AM_I_REG_ADDR           0x70        /*!< Register addresses of the "who am I" register */
 
+#define MPU6500_ACCEL_XOUT_H                0x3B
 #define MPU6500_ACCEL_ZOUT_H                0x3F
 
 #define MPU6500_PWR_MGMT_1_REG_ADDR         0x6B        /*!< Register addresses of the power managment register */
 #define MPU6500_RESET_BIT                   7
 
-#define LOG_LOCAL_LEVEL                     ESP_LOG_INFO
+#define BUTTON1                             19
+
+// #define LOG_LOCAL_LEVEL                     ESP_LOG_INFO
 
 /**
  * @brief Read a sequence of bytes from a MPU6500 sensor registers
@@ -72,8 +77,8 @@ static esp_err_t i2c_master_init(void)
         .mode = I2C_MODE_MASTER,
         .sda_io_num = I2C_MASTER_SDA_IO,
         .scl_io_num = I2C_MASTER_SCL_IO,
-        .sda_pullup_en = GPIO_PULLUP_ENABLE,
-        .scl_pullup_en = GPIO_PULLUP_ENABLE,
+        .sda_pullup_en = I2C_INTERNAL_PULLUP,
+        .scl_pullup_en = I2C_INTERNAL_PULLUP,
         .master.clk_speed = I2C_MASTER_FREQ_HZ,
     };
 
@@ -82,9 +87,9 @@ static esp_err_t i2c_master_init(void)
     return i2c_driver_install(i2c_master_port, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
 }
 
-int16_t rawZ;
-float accZ;
 const float accel_scale = 16384;
+const float accX_offset = 0.03;
+const float accY_offset = 0;
 const float accZ_offset = 0.13;
 
 static esp_err_t mpu6500_get_accZ(float *accZ)
@@ -99,9 +104,36 @@ static esp_err_t mpu6500_get_accZ(float *accZ)
     return ret;
 }
 
+typedef struct acc_data {
+    float accX;
+    float accY;
+    float accZ;
+} acc_data_t;
+
+static esp_err_t mpu6500_get_acc(acc_data_t *acc)
+{
+    uint8_t data[6];
+    int16_t rawX, rawY, rawZ;
+    int ret;
+
+    ret = mpu6500_register_read(MPU6500_ACCEL_XOUT_H, data, 6);
+    rawX = (data[0] << 8 | data[1]);
+    rawY = (data[2] << 8 | data[3]);
+    rawZ = (data[4] << 8 | data[5]);
+    acc->accX = rawX / accel_scale - accX_offset;
+    acc->accY = rawY / accel_scale - accY_offset;
+    acc->accZ = rawZ / accel_scale - accZ_offset;
+    return ret;
+}
+
 void app_main(void)
 {
     uint8_t data[2];
+    acc_data_t accData;
+
+    gpio_set_direction(BUTTON1, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(BUTTON1, GPIO_PULLUP_ONLY);
+
     ESP_ERROR_CHECK(i2c_master_init());
     ESP_LOGI(TAG, "I2C initialized successfully");
 
@@ -116,12 +148,14 @@ void app_main(void)
         // ESP_ERROR_CHECK(mpu6500_register_read(MPU6500_ACCEL_ZOUT_H, data, 2));
         // rawZ = (data[0] << 8 | data[1]);
         // accZ = rawZ / accel_scale - accZ_offset;
-        ESP_ERROR_CHECK(mpu6500_get_accZ(&accZ));
-        
-        ESP_LOGI(TAG, "AccZ: %f", accZ);
-        vTaskDelay(10 / portTICK_PERIOD_MS);
+        // ESP_ERROR_CHECK(mpu6500_get_accZ(&accZ));
+        ESP_ERROR_CHECK(mpu6500_get_acc(&accData));
+
+        // ESP_LOGI(TAG, "AccZ: %f", accZ);
+        // printf("%lld %f %f %f\n", esp_timer_get_time() / 1000, accData.accX, accData.accY, accData.accZ);
+        printf("%f %f %f %d\n", accData.accX, accData.accY, accData.accZ, gpio_get_level(BUTTON1));
+        vTaskDelay(pdMS_TO_TICKS(3));
     }
 
     ESP_ERROR_CHECK(i2c_driver_delete(I2C_MASTER_NUM));
-    ESP_LOGI(TAG, "I2C de-initialized successfully");
 }
