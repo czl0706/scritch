@@ -1,21 +1,22 @@
 import os
 
-from serial_port import ser
+from serial_port import ser, ser_prepare
 
 if not os.path.exists('./data'):
     os.mkdir('./data')
 
 index = 0
 f = open('./data/data.csv', 'a')
+ser_prepare()
 
 try:
     while True:
-        while ser.in_waiting:          
-            data = ser.readline().decode()
-            if 'i2cWriteReadNonStop' in data:
-                print(f'Error {index}')
-                index += 1
-                continue
-            f.write(data)
-except KeyboardInterrupt:
+        if ser.in_waiting:          
+            data = ser.readline().decode().strip()
+            print(data)
+            f.write(data + '\n')
+            
+except Exception as e:
     ser.close() 
+    f.close()
+    

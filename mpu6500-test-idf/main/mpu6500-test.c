@@ -49,7 +49,7 @@ void app_main(void)
         ESP_ERROR_CHECK(mpu6500_get_acc(&accData));
 
         // printf("%lld ", esp_timer_get_time() / 1000);
-        printf("%+f %+f %+f %d\n", accData.accX, accData.accY, accData.accZ, !gpio_get_level(BUTTON1));
+        printf("%+f, %+f, %+f, %d\n", accData.accX, accData.accY, accData.accZ, !gpio_get_level(BUTTON1));
         vTaskDelay(pdMS_TO_TICKS(3));
     }
 

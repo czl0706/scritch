@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-SAMPLING_PERIOD = 5e-3
+SAMPLING_PERIOD = 3e-3
 WINDOW_LENGTH = 1.5
 STRIDE_LENGTH = 0.1
 
