@@ -143,7 +143,7 @@ for epoch in range(n_epochs):
 
     # save model if validation loss has decreased
     if valid_loss <= valid_loss_min:
-        print(f'Validation loss decreased({valid_loss_min:.6f} -> {valid_loss:.6f}). Saving model ..')
+        print(f'Validation loss decreased({valid_loss_min:.6f} -> {valid_loss:.6f}). Saving model...')
         torch.save(model.state_dict(), os.path.join(save_path, 'model.pt'))
         valid_loss_min = valid_loss
         valid_acc_max = valid_acc

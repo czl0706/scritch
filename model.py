@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset
 import numpy as np
 from torchsummary import summary
+from thop import profile
 
 SAMPLING_PERIOD = 3e-3
 # THRESHOLD = 0.5
@@ -15,7 +16,8 @@ WINDOW_LENGTH = 0.3
 STRIDE_LENGTH = 0.1
 
 def proc_data(feat_x, feat_y, feat_z):
-    return feat_z
+    # feat_z = np.sign(feat_z) * (feat_z ** 2) / (feat_x ** 2 + feat_y ** 2 + feat_z ** 2)
+    return np.hstack((feat_x, feat_y, feat_z))
 
 # class Scritch(nn.Module):
 #   def __init__(self):
@@ -109,25 +111,65 @@ class ScritchData(Dataset):
 #   def forward(self, x):
 #     return self.net(x)
 
+# class Scritch(nn.Module):
+#   def __init__(self):
+#     super(Scritch, self).__init__()
+
+#     self.net = nn.Sequential(
+#       nn.Linear(int(WINDOW_LENGTH/SAMPLING_PERIOD) * 3, 200),
+#       nn.ReLU(),
+#     #   nn.Dropout(0.2),
+#       nn.Linear(200, 40),
+#       nn.ReLU(),
+#       nn.Linear(40, 2),
+#     )
+
+#   def forward(self, x):
+#     return self.net(x)
+
 class Scritch(nn.Module):
   def __init__(self):
     super(Scritch, self).__init__()
 
-    self.net = nn.Sequential(
-      nn.Linear(int(WINDOW_LENGTH/SAMPLING_PERIOD), 200),
-      nn.ReLU(),
-      nn.Dropout(0.2),
-      nn.Linear(200, 40),
-      nn.ReLU(),
-      nn.Linear(40, 2),
+    in_feat = int(WINDOW_LENGTH/SAMPLING_PERIOD)
+    net1_feat = 80
+    net2_feat = 40
+
+    self.net1_1 = nn.Sequential(
+        nn.Linear(in_feat, net1_feat),
+        nn.ReLU(),
+    )
+    self.net1_2 = nn.Sequential(
+        nn.Linear(in_feat, net1_feat),
+        nn.ReLU(),
+    )
+    self.net1_3 = nn.Sequential(
+        nn.Linear(in_feat, net1_feat),
+        nn.ReLU(),
+    )
+
+    self.net2 = nn.Sequential(
+        nn.Linear(net1_feat * 3, net2_feat),
+        nn.ReLU(),
+        nn.Linear(net2_feat, 2)
     )
 
   def forward(self, x):
-    return self.net(x)
+    # split (B, 300) into 3 * (B, 100)
+    x, y, z = torch.chunk(x, 3, dim=1)
+    x = self.net1_1(x)
+    y = self.net1_2(y)
+    z = self.net1_3(z)
+
+    return self.net2(torch.cat((x, y, z), dim=1))
   
 if __name__ == '__main__':
     # test dataset and print 
     dataset = ScritchData(['./data/data1.csv'])
-    print(dataset[0])
-
-    summary(Scritch(), input_size=(1, int(WINDOW_LENGTH/SAMPLING_PERIOD)), device='cpu')
+    print(f'\nInput shape: {dataset[0][0].shape} Output shape: {dataset[0][1].shape}')
+    
+    in_shape = int(WINDOW_LENGTH/SAMPLING_PERIOD) * 3
+    model = Scritch()
+    summary(model, input_size=(in_shape,), device='cpu')
+    macs, parm = profile(model, inputs=(torch.randn(1, in_shape), ))
+    print(f'MACs: {int(macs)}, Params: {int(parm)}')
