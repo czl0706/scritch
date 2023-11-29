@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from model import *
+from utils import *
 from sercomm import ser, ser_prepare
 
 INTERVAL = 0.8

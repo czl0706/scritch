@@ -6,7 +6,7 @@ import numpy as np
 from tqdm import tqdm
 from torchmetrics.classification import BinaryAccuracy
 import os 
-from model import *
+from utils import *
 
 config = {
   'device': torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
