@@ -13,7 +13,7 @@ from torchsummary import summary
 SAMPLING_PERIOD = 3e-3
 WINDOW_LENGTH = 0.5
 STRIDE_LENGTH = 0.1
-THRESHOLD = 0.5
+# THRESHOLD = 0.5
 
 # class Scritch(nn.Module):
 #   def __init__(self):

@@ -32,7 +32,13 @@ try:
             index += 1
             if index == int(INTERVAL/SAMPLING_PERIOD):
                 with torch.no_grad():
-                    print(f'{model(torch.from_numpy(x)).item():.2f}, {"Are you scratching?" if model(torch.from_numpy(x)).item() > THRESHOLD else "Everything looks fine"}')
+                    # logistic regression
+                    # print(f'{model(torch.from_numpy(x)).item():.2f}, {"Are you scratching?" if model(torch.from_numpy(x)).item() > THRESHOLD else "Everything looks fine"}')
+                    
+                    # prob = F.softmax(model(torch.from_numpy(x)), dim=1)
+                    scratching = model(torch.from_numpy(x)).argmax(dim=1).item()
+                    print("Are you scratching?" if scratching else "Everything looks fine")
+                
                 index = 0
 except KeyboardInterrupt:
     ser.close() 
