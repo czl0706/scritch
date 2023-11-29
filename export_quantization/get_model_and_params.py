@@ -5,3 +5,6 @@ sys.path.append(
                  '../'))
 
 from model import *
+
+torch_model_path = '../models/Scritch.pt'
+onnx_save_path = '../models/Scritch.onnx'

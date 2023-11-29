@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 model = Scritch()
-model.load_state_dict(torch.load('../models/model.pt'))
+model.load_state_dict(torch.load(torch_model_path))
 model.eval()
 
 weights = []
