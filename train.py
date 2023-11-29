@@ -5,56 +5,35 @@ import torch.nn as nn
 import numpy as np
 from torchsummary import summary
 from tqdm import tqdm
+from torchmetrics.classification import BinaryAccuracy
 import os 
 from model import *
 
 config = {
-  "device": torch.device("cuda" if torch.cuda.is_available() else "cpu"),
-  # you can set your own training configurations
-  "batch_size": 100,
-  "learning_rate": 1e-5,
+  'device': torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
+  'batch_size': 200,
+  'learning_rate': 1e-5,
   'epochs': 1000,
   'early_stop': 100,
-  'save_path': './models'
+  'save_path': './models',
+  'seed': 42,
+  'log_step': 50
 }
 
-class ScritchData(Dataset):
-    def __init__(self, filenames):
-        arr = []
-        for filename in filenames:
-            arr.append(np.loadtxt(filename, delimiter=",", dtype=np.float32))
-            # print(arr[-1].shape)
-        arr = np.vstack(arr)
-        # print(arr.shape)
-        z_data, label = arr[:, 2], arr[:, 3]
+def set_seed(seed):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    np.random.seed(seed)
+    torch.backends.cudnn.deterministic = True
 
-        window = lambda a, w, o: np.lib.stride_tricks.as_strided(a, strides = a.strides * 2, shape = (a.size - w + 1, w))[::o]
-        window_size, sliding_size = int(WINDOW_LENGTH/SAMPLING_PERIOD), int(STRIDE_LENGTH/SAMPLING_PERIOD)
-
-        inp_feat = window(z_data, window_size, sliding_size)
-        out_feat = np.sum(
-            window(label, window_size, sliding_size),
-            axis=1) > sliding_size//2
-        out_feat = out_feat.astype('float32')
-
-        self.inp_feat = inp_feat
-        self.out_feat = out_feat
+set_seed(config['seed'])
     
-    def __len__(self):
-        return len(self.out_feat)
-    
-    def __getitem__(self, idx):
-        return self.inp_feat[idx], self.out_feat[idx]
-    
-full_dataset = ScritchData(['./data/data1.csv', './data/data2.csv', './data/data3.csv'])
-# full_dataset = ScritchData(['./data/data_finger.csv'])
+full_dataset = ScritchData(['./data/data1.csv'])
 
-# train_size = int(0.8 * len(full_dataset))
-# valid_size = len(full_dataset) - train_size
 train_ds, valid_ds = torch.utils.data.random_split(full_dataset, [0.8, 0.2])
 
-train_dl = DataLoader(train_ds, config["batch_size"], shuffle=True, drop_last=True, num_workers=0, pin_memory=True)
-valid_dl = DataLoader(valid_ds, config["batch_size"], shuffle=True, drop_last=True, num_workers=0, pin_memory=True)
+train_dl = DataLoader(train_ds, config['batch_size'], shuffle=True, drop_last=True, num_workers=0, pin_memory=True)
+valid_dl = DataLoader(valid_ds, config['batch_size'], shuffle=True, drop_last=True, num_workers=0, pin_memory=True)
   
 model = Scritch().to(config['device'])
 
@@ -64,10 +43,12 @@ loss_func = nn.BCELoss()
 optimizer = torch.optim.AdamW(model.parameters(), lr=config['learning_rate'])
 
 # initialize tracker for minimum validation loss
-valid_loss_min = np.Inf # set initial "min" to infinity
+valid_loss_min = np.Inf # set initial 'min' to infinity
+valid_acc_max = 0.0
 # initialize history for recording what we want to know
 history = []
-device, n_epochs, save_path = config['device'], config['epochs'], config['save_path']
+device, n_epochs, save_path, log_step, early_stop = \
+    config['device'], config['epochs'], config['save_path'], config['log_step'], config['early_stop']
 
 early_stop_count = 0
 
@@ -76,6 +57,8 @@ for epoch in range(n_epochs):
     train_loss = 0.0
     valid_loss = 0.0
     valid_acc = 0.0
+    train_size = 0
+    valid_size = 0
     lrs    = []
     result = {'train_loss': [], 'val_loss': [], 'lrs': []}
 
@@ -85,7 +68,8 @@ for epoch in range(n_epochs):
     #######################
     # train the model #
     #######################
-    for batch_idx, item in enumerate(tqdm(train_dl)):
+    # for batch_idx, item in enumerate(tqdm(train_dl)):
+    for batch_idx, item in enumerate(train_dl):
         x, y = item
         x, y = x.to(device, non_blocking=True), y.to(device, non_blocking=True)
 
@@ -107,13 +91,15 @@ for epoch in range(n_epochs):
 
         # update running training loss
         train_loss += loss.item()*x.size(0)
+        train_size += x.size(0)
 
     ######################
     # validate the model #
     ######################
     model.eval()
     with torch.no_grad():
-        for batch_idx, item in enumerate(tqdm(valid_dl)):
+        # for batch_idx, item in enumerate(tqdm(valid_dl)):
+        for batch_idx, item in enumerate(valid_dl):
             x, y = item
             x, y = x.to(device, non_blocking=True), y.to(device, non_blocking=True)
 
@@ -125,37 +111,41 @@ for epoch in range(n_epochs):
             # update running validation loss
             valid_loss += loss.item()*x.size(0)
 
-            pred = output > 0.5
+            pred = (output > THRESHOLD)
             valid_acc += pred.eq(y).sum().item()
+            valid_size += x.size(0)
+            # save_y.append(y.cpu()), save_pred.append(pred.cpu())
 
     # print training/validation statistics
     # calculate average loss over an epoch
-    train_loss = train_loss/len(train_dl.dataset)
+    train_loss = train_loss / train_size
     result['train_loss'] = train_loss
-    valid_loss = valid_loss/len(valid_dl.dataset)
+    valid_loss = valid_loss / valid_size
     result['val_loss'] = valid_loss
     leaning_rate = lrs
     result['lrs'] = leaning_rate
     history.append(result)
 
-    valid_acc = (100. * valid_acc) / len(valid_dl.dataset)
+    valid_acc = (100. * valid_acc) / valid_size
 
-    print('Epoch {:2d}, lr: {:.6f} Train Loss: {:.6f} Valid Loss: {:.6f} Valid Acc: {:.2f}%'.format(
-        epoch+1,
-        leaning_rate[-1],
-        train_loss,
-        valid_loss,
-        valid_acc
-        ))
+    # save_y, save_pred = torch.vstack(save_y), torch.vstack(save_pred)
+    # print(BinaryAccuracy().to(device)(save_y, save_pred)); save_y, save_pred = [], []
+
+    if (epoch+1) % log_step == 0:
+        print('Epoch {:2d}, lr: {:.6f} Train Loss: {:.6f} Valid Loss: {:.6f} Valid Acc: {:.2f}%'.format(
+            epoch+1,
+            leaning_rate[-1],
+            train_loss,
+            valid_loss,
+            valid_acc
+            ))
 
     # save model if validation loss has decreased
     if valid_loss <= valid_loss_min:
-        print("Validation loss decreased({:.6f}-->{:.6f}). Saving model ..".format(
-            valid_loss_min,
-            valid_loss
-        ))
+        print(f'Validation loss decreased({valid_loss_min:.6f} -> {valid_loss:.6f}). Saving model ..')
         torch.save(model.state_dict(), os.path.join(save_path, 'model.pt'))
         valid_loss_min = valid_loss
+        valid_acc_max = valid_acc
         # print('Saving checkpoint...')
         # state = {
         #     'state_dict': model.state_dict(),
@@ -169,6 +159,8 @@ for epoch in range(n_epochs):
     else:
         early_stop_count += 1
 
-    if early_stop_count >= config['early_stop']:
+    if early_stop_count >= early_stop:
         print('\nModel is not improving, so we halt the training session.')
         break
+
+print(f'Model accuracy: {valid_acc_max:.2f}%')

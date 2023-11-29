@@ -1,6 +1,6 @@
 import os
 
-from serial_port import ser, ser_prepare
+from sercomm import ser, ser_prepare
 
 if not os.path.exists('./data'):
     os.mkdir('./data')

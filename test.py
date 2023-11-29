@@ -1,10 +1,9 @@
 import numpy as np
 import torch
 from model import *
-from serial_port import ser, ser_prepare
+from sercomm import ser, ser_prepare
 
 INTERVAL = 0.5
-THRESHOLD = 0.5
 
 x = np.zeros((1, int(WINDOW_LENGTH/SAMPLING_PERIOD)), dtype=np.float32)
 # x = [0] * 200
@@ -33,11 +32,7 @@ try:
             index += 1
             if index == int(INTERVAL/SAMPLING_PERIOD):
                 with torch.no_grad():
-                    # print(model(torch.from_numpy(x)).item())
-                    if model(torch.from_numpy(x)).item() > THRESHOLD:
-                        print('Are you scratching?')
-                    else:
-                        print('Everything looks fine')
+                    print(f'{model(torch.from_numpy(x)).item():.2f}, {"Are you scratching?" if model(torch.from_numpy(x)).item() > THRESHOLD else "Everything looks fine"}')
                 index = 0
 except KeyboardInterrupt:
     ser.close() 
