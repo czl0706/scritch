@@ -12,7 +12,7 @@ config = {
   'device': torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
   'batch_size': 200,
   'learning_rate': 1e-5,
-  'epochs': 1000,
+  'epochs': 100000,
   'early_stop': 100,
   'save_path': './models',
   'seed': 42,
@@ -27,7 +27,7 @@ def set_seed(seed):
 
 set_seed(config['seed'])
     
-full_dataset = ScritchData(['./data/data1.csv'])
+full_dataset = ScritchData(['./data/data.csv', './data/data1.csv', './data/data2.csv'])
 
 train_ds, valid_ds = torch.utils.data.random_split(full_dataset, [0.8, 0.2])
 

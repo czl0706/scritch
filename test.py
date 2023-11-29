@@ -6,7 +6,6 @@ from sercomm import ser, ser_prepare
 INTERVAL = 0.5
 
 x = np.zeros((1, int(WINDOW_LENGTH/SAMPLING_PERIOD)), dtype=np.float32)
-# x = [0] * 200
 index = 0
 
 model = Scritch() #.cuda()
@@ -36,7 +35,7 @@ try:
                     # print(f'{model(torch.from_numpy(x)).item():.2f}, {"Are you scratching?" if model(torch.from_numpy(x)).item() > THRESHOLD else "Everything looks fine"}')
                     
                     # prob = F.softmax(model(torch.from_numpy(x)), dim=1)
-                    scratching = model(torch.from_numpy(x)).argmax(dim=1).item()
+                    scratching = model(torch.from_numpy(proc_data(None, None, x))).argmax(dim=1).item()
                     print("Are you scratching?" if scratching else "Everything looks fine")
                 
                 index = 0
