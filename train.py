@@ -3,7 +3,6 @@ from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 import torch.nn as nn
 import numpy as np
-from torchsummary import summary
 from tqdm import tqdm
 from torchmetrics.classification import BinaryAccuracy
 import os 
@@ -37,9 +36,8 @@ valid_dl = DataLoader(valid_ds, config['batch_size'], shuffle=True, drop_last=Tr
   
 model = Scritch().to(config['device'])
 
-summary(model, input_size=(1, int(WINDOW_LENGTH/SAMPLING_PERIOD)))
-
-loss_func = nn.BCELoss()
+# loss_func = nn.BCELoss()
+loss_func = nn.CrossEntropyLoss()
 optimizer = torch.optim.AdamW(model.parameters(), lr=config['learning_rate'])
 
 # initialize tracker for minimum validation loss
@@ -111,10 +109,13 @@ for epoch in range(n_epochs):
             # update running validation loss
             valid_loss += loss.item()*x.size(0)
 
-            pred = (output > THRESHOLD)
-            valid_acc += pred.eq(y).sum().item()
+            # pred = (output > THRESHOLD)
+            # valid_acc += pred.eq(y).sum().item()
+
+            pred = output.argmax(dim=1)
+            valid_acc += pred.eq(y.argmax(dim=1)).sum().item()
+
             valid_size += x.size(0)
-            # save_y.append(y.cpu()), save_pred.append(pred.cpu())
 
     # print training/validation statistics
     # calculate average loss over an epoch
@@ -160,7 +161,7 @@ for epoch in range(n_epochs):
         early_stop_count += 1
 
     if early_stop_count >= early_stop:
-        print('\nModel is not improving, so we halt the training session.')
+        print(f'\nModel is not improving, so we halt the training session.')
         break
 
 print(f'Model accuracy: {valid_acc_max:.2f}%')
