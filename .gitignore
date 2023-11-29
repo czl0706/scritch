@@ -2,6 +2,10 @@
 data/
 archived/
 
+models/*
+!models/model.pt
+!models/Scritch.onnx
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

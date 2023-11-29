@@ -52,3 +52,7 @@ class ScritchData(Dataset):
 if __name__ == '__main__':
     dataset = ScritchData(['./data/data1.csv'])
     print(f'Input shape: {dataset[0][0].shape} Output shape: {dataset[0][1].shape}')
+
+    # test the shape of data is fit to model
+    model = Scritch()
+    model(torch.from_numpy(dataset[0][0]).unsqueeze(0))
