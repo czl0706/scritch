@@ -37,6 +37,7 @@ $ usbipd wsl detach --busid 1-2
 ```
 
 ### Collect data
+Check the `COM_PORT` in `sercomm.py` is correctly configured.
 ```pwsh
 $ python ./collect.py 
 ```
@@ -48,10 +49,24 @@ Open `model.py` and change the parameters.
 ```pwsh
 $ python ./train.py 
 ```
-Ensure that the pre-processing steps are implemented within the ScritchData dataset.
+The pre-processing steps should be implemented within the ScritchData dataset (in `utils.py`).
 
-### Testing
+To check the size of the model:
+```pwsh
+$ python ./model.py 
+```
+
+### Testing model on computer
 Make sure that the pre-process procedure is consistent with the training steps.
 ```pwsh
 $ python ./test.py
 ```
+
+### Model Structure
+![Model structure](./assets/Scritch.onnx.png)
+
+### Quantization
+Check the weights of the trained model:
+![Histogram of trained model's weights](./assets/hist.png)
+
+To be continued...

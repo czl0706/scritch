@@ -1,8 +1,6 @@
 import torch
 from torch.utils.data import Dataset
 import numpy as np
-from torchsummary import summary
-from thop import profile
 
 from model import *
 
