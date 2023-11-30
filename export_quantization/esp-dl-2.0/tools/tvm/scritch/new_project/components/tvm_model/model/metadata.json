@@ -4,7 +4,7 @@
       "executors": [
         "aot"
       ],
-      "export_datetime": "2023-11-30 22:00:42Z",
+      "export_datetime": "2023-11-30 22:18:16Z",
       "external_dependencies": [
         {
           "short_name": "tvm_standalone_crt",

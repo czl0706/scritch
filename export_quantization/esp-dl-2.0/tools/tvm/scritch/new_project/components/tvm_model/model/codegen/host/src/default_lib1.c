@@ -266,12 +266,12 @@ TVM_DLL int32_t tvmgen_default_fused_strided_slice_divide_round_clip_cast_cast_2
 extern "C"
 #endif
 TVM_DLL int32_t tvmgen_default___tvm_main__(float* input_buffer_var, float* output_buffer_var, uint8_t* global_const_workspace_0_var, uint8_t* global_workspace_1_var) {
-  void* sid_3_let = (&(global_workspace_1_var[0]));
-  void* sid_2_let = (&(global_workspace_1_var[304]));
-  void* sid_5_let = (&(global_workspace_1_var[0]));
-  void* sid_4_let = (&(global_workspace_1_var[368]));
-  void* sid_1_let = (&(global_workspace_1_var[0]));
   void* sid_6_let = (&(global_workspace_1_var[432]));
+  void* sid_4_let = (&(global_workspace_1_var[368]));
+  void* sid_2_let = (&(global_workspace_1_var[304]));
+  void* sid_1_let = (&(global_workspace_1_var[0]));
+  void* sid_3_let = (&(global_workspace_1_var[0]));
+  void* sid_5_let = (&(global_workspace_1_var[0]));
   void* sid_7_let = (&(global_workspace_1_var[192]));
   void* sid_8_let = (&(global_workspace_1_var[0]));
   if (tvmgen_default_fused_strided_slice_divide_round_clip_cast_cast(input_buffer_var, sid_1_let, global_const_workspace_0_var, global_workspace_1_var) != 0 ) return -1;

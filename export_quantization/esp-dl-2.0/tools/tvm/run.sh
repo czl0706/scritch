@@ -1,6 +1,6 @@
 #! /bin/bash
 
-target_chip="esp32s2"
+target_chip="esp32"
 
 # https://docs.espressif.com/projects/esp-dl/zh_CN/latest/esp32/tutorials/deploying-models-through-tvm.html#
 python -m onnxruntime.quantization.preprocess --input model.onnx --output model_opt.onnx

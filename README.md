@@ -72,6 +72,18 @@ $ python ./test.py
 Check the weights of the trained model:  
 ![Histogram of trained model's weights](./assets/hist.png)
 
-Then follow the steps from [ESP-DL 用户指南](https://docs.espressif.com/projects/esp-dl/zh_CN/latest/esp32/tutorials/deploying-models-through-tvm.html#)  
+### Converting and run on esp-dl framework
+
+It doesn't work.
+
+~~Then follow the steps from [ESP-DL 用户指南](https://docs.espressif.com/projects/esp-dl/zh_CN/latest/esp32/tutorials/deploying-models-through-tvm.html#)~~
+
+~~[==](https://esp32.com/viewtopic.php?p=111753)~~
+
+### To-dos
+- [ ] Training model... 
+- [ ] Converting to tflite model
+- [ ] Deploy model to esp32
+- [ ] Add BLE to esp32
 
 To be continued...  

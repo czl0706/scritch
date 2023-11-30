@@ -46,5 +46,25 @@ static void inference_task()
 
 void app_main()
 {
-    xTaskCreatePinnedToCore(inference_task, TAG, 4 * 1024, NULL, 6, NULL, 0);
+    // xTaskCreatePinnedToCore(inference_task, TAG, 4 * 1024, NULL, 6, NULL, 0);
+    struct tvmgen_default_inputs inputs = {
+      .input = input_data,
+    };
+    struct tvmgen_default_outputs outputs = {
+      .output = output_data,
+    };
+
+    uint64_t elapsed_time = 0;
+
+    uint64_t time1, time2;
+    time1 = esp_timer_get_time();
+    int ret_val = tvmgen_default_run(&inputs, &outputs);
+    time2 = esp_timer_get_time();
+    elapsed_time = time2 - time1;
+    printf("\ntime: %lld us\n", elapsed_time);
+
+    while (1)
+    {
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+    }
 }
