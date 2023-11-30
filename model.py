@@ -9,7 +9,7 @@ SAMPLING_PERIOD = 3e-3
 # WINDOW_LENGTH = 1.5
 # STRIDE_LENGTH = 0.1
 
-WINDOW_LENGTH = 0.3
+WINDOW_LENGTH = 0.45
 STRIDE_LENGTH = 0.1
 
 # # logistic regression
@@ -74,6 +74,7 @@ class Scritch(nn.Module):
     )
 
     self.net2 = nn.Sequential(
+        nn.Dropout(0.2),
         nn.Linear(net1_feat * 3, net2_feat),
         nn.ReLU(),
         nn.Linear(net2_feat, 2)

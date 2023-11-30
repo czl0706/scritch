@@ -1,5 +1,7 @@
 # scritch
 
+![😻](./assets/2lanem.jpg)
+
 ### Debugging esp-idf project on WSL 2
 First, install usbipd on the host(Windows):   
 ```pwsh

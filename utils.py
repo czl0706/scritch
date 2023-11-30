@@ -25,15 +25,14 @@ class ScritchData(Dataset):
         feat_x = window(x_data, window_size, sliding_size)
         feat_y = window(y_data, window_size, sliding_size)
         feat_z = window(z_data, window_size, sliding_size)
-        out_feat = np.sum(
-            window(label, window_size, sliding_size),
-            axis=1) > sliding_size//2
+        out_feat = np.sum(window(label, window_size, sliding_size),
+                          axis=1) > sliding_size//2
         
         # logistic regression
         # out_feat = out_feat.astype('float32')
         
         # one hot encoding
-        # out_feat = F.one_hot(torch.from_numpy(out_feat.astype('float32')).long(), 2).float()\
+        # out_feat = F.one_hot(torch.from_numpy(out_feat.astype('float32')).long(), 2).float()
 
         inp_feat = proc_data(feat_x, feat_y, feat_z)
         out_feat = np.eye(2)[out_feat.astype('int32')]
