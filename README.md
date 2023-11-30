@@ -1,5 +1,6 @@
-# scritch
+# Scritch
 
+~~Deep learning is essentially part of digital signal processing~~
 ![😻](./assets/2lanem.jpg)
 
 ### Debugging esp-idf project on WSL 2
@@ -8,13 +9,13 @@ First, install usbipd on the host(Windows):
 $ winget install usbipd
 ```
 
-and the step on WSL:
+and the step on WSL:  
 ```sh
 $ sudo apt install linux-tools-generic hwdata
 $ sudo update-alternatives --install /usr/local/bin/usbip usbip /usr/lib/linux-tools/*-generic/usbip 20
 ```
 
-List all the devices on the host:
+List all the devices on the host:  
 ```pwsh
 $ usbipd list
 ```
@@ -39,27 +40,27 @@ $ usbipd wsl detach --busid 1-2
 ```
 
 ### Collect data
-Check the `COM_PORT` in `sercomm.py` is correctly configured.
+Check the `COM_PORT` in `sercomm.py` is correctly configured.  
 ```pwsh
 $ python ./collect.py 
 ```
-This program reads all the data transmitted from UART.
+This program reads all the data transmitted from UART.  
 
 ### Modify model & Training 
-Open `model.py` and change the parameters.
+Open `model.py` and change the parameters.  
 
 ```pwsh
 $ python ./train.py 
 ```
-The pre-processing steps should be implemented within the ScritchData dataset (in `utils.py`).
+The pre-processing steps should be implemented within the ScritchData dataset (in `utils.py`).  
 
-To check the size of the model:
+To check the size of the model:  
 ```pwsh
 $ python ./model.py 
 ```
 
 ### Testing model on computer
-Make sure that the pre-process procedure is consistent with the training steps.
+Make sure that the pre-process procedure is consistent with the training steps.  
 ```pwsh
 $ python ./test.py
 ```
@@ -68,7 +69,9 @@ $ python ./test.py
 ![Model structure](./assets/Scritch.onnx.png)
 
 ### Quantization
-Check the weights of the trained model:
+Check the weights of the trained model:  
 ![Histogram of trained model's weights](./assets/hist.png)
 
-To be continued...
+Then follow the steps from [ESP-DL 用户指南](https://docs.espressif.com/projects/esp-dl/zh_CN/latest/esp32/tutorials/deploying-models-through-tvm.html#)  
+
+To be continued...  

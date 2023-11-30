@@ -4,6 +4,13 @@ import numpy as np
 
 from model import *
 
+ds_list = ['./data/data1.csv', 
+           './data/data2.csv',
+           './data/data3.csv',
+           './data/data4.csv',
+           './data/data5.csv',
+           './data/data6.csv']
+
 def proc_data(feat_x, feat_y, feat_z):
     # feat_z = np.sign(feat_z) * (feat_z ** 2) / (feat_x ** 2 + feat_y ** 2 + feat_z ** 2)
     return np.hstack((feat_x, feat_y, feat_z))
@@ -45,9 +52,12 @@ class ScritchData(Dataset):
     
     def __getitem__(self, idx):
         return self.inp_feat[idx], self.out_feat[idx]
-  
+    
+def get_dataset() -> ScritchData:
+    return ScritchData(ds_list)
+    
 if __name__ == '__main__':
-    dataset = ScritchData(['./data/data1.csv'])
+    dataset = get_dataset()
     print(f'Input shape: {dataset[0][0].shape} Output shape: {dataset[0][1].shape}')
 
     # test the shape of data is fit to model

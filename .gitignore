@@ -2,6 +2,8 @@
 data/
 archived/
 
+*.so
+
 models/*
 !models/model.pt
 !models/Scritch.onnx

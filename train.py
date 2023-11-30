@@ -27,12 +27,14 @@ def set_seed(seed):
 
 set_seed(config['seed'])
     
-full_dataset = ScritchData(['./data/data1.csv', 
-                            './data/data2.csv',
-                            './data/data3.csv',
-                            './data/data4.csv',
-                            './data/data5.csv',
-                            './data/data6.csv'])
+# full_dataset = ScritchData(['./data/data1.csv', 
+#                             './data/data2.csv',
+#                             './data/data3.csv',
+#                             './data/data4.csv',
+#                             './data/data5.csv',
+#                             './data/data6.csv'])
+
+full_dataset = get_dataset()
 
 train_ds, valid_ds = torch.utils.data.random_split(full_dataset, [0.7, 0.3])
 
