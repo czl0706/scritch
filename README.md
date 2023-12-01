@@ -81,9 +81,9 @@ It doesn't work.
 ~~[==](https://esp32.com/viewtopic.php?p=111753)~~
 
 ### To-dos
-- [ ] Training model... 
+- [ ] Train mode
 - [ ] Converting to tflite model
 - [ ] Deploy model to esp32
-- [ ] Add BLE to esp32
+- [ ] Add BLE connectivity to esp32
 
 To be continued...  
