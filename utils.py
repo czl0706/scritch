@@ -24,16 +24,30 @@ class ScritchData(Dataset):
         arr = np.vstack(arr)
         # print(arr.shape)
         # z_data, label = arr[:, 2], arr[:, 3]
-        x_data, y_data, z_data, label = arr.T
+        
+        # sampling
+        arr = arr.T[::, ::DS_FACTOR]
+        
+        # print(arr.shape)
+        
+        x_data, y_data, z_data, label = arr #.T
 
-        window = lambda a, w, o: np.lib.stride_tricks.as_strided(a, strides = a.strides * 2, shape = (a.size - w + 1, w))[::o]
-        window_size, sliding_size = int(WINDOW_LENGTH/SAMPLING_PERIOD), int(STRIDE_LENGTH/SAMPLING_PERIOD)
+        window = lambda m: np.lib.stride_tricks.as_strided(m, 
+                                                           strides = m.strides * 2, 
+                                                           shape = (m.size - WINDOW_LENGTH + 1, WINDOW_LENGTH)
+                                                           )[::STRIDE_LENGTH]
 
-        feat_x = window(x_data, window_size, sliding_size)
-        feat_y = window(y_data, window_size, sliding_size)
-        feat_z = window(z_data, window_size, sliding_size)
-        out_feat = np.sum(window(label, window_size, sliding_size),
-                          axis=1) > sliding_size//2
+        feat_x, feat_y, feat_z = window(x_data), window(y_data), window(z_data)
+        out_feat = np.sum(window(label), axis=1) > STRIDE_LENGTH//2
+        
+        # window = lambda m, w, o: np.lib.stride_tricks.as_strided(m, strides = m.strides * 2, shape = (m.size - w + 1, w))[::o]
+        # window_size, sliding_size = WINDOW_LENGTH, STRIDE_LENGTH
+
+        # feat_x = window(x_data)
+        # feat_y = window(y_data)
+        # feat_z = window(z_data)
+        # out_feat = np.sum(window(label, window_size, sliding_size),
+        #                   axis=1) > sliding_size//2
         
         # logistic regression
         # out_feat = out_feat.astype('float32')
@@ -58,6 +72,7 @@ def get_dataset() -> ScritchData:
     
 if __name__ == '__main__':
     dataset = get_dataset()
+    print(f'Number of training data: {len(dataset)}')
     print(f'Input shape: {dataset[0][0].shape} Output shape: {dataset[0][1].shape}')
 
     # test the shape of data is fit to model

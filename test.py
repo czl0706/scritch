@@ -5,9 +5,9 @@ from sercomm import ser, ser_prepare
 
 INTERVAL = 0.8
 
-acc_x = np.zeros((1, int(WINDOW_LENGTH/SAMPLING_PERIOD)), dtype=np.float32)
-acc_y = np.zeros((1, int(WINDOW_LENGTH/SAMPLING_PERIOD)), dtype=np.float32)
-acc_z = np.zeros((1, int(WINDOW_LENGTH/SAMPLING_PERIOD)), dtype=np.float32)
+acc_x = np.zeros((1, int(WINDOW_PERIOD/DATA_SAMPLING_PERIOD)), dtype=np.float32)
+acc_y = np.zeros((1, int(WINDOW_PERIOD/DATA_SAMPLING_PERIOD)), dtype=np.float32)
+acc_z = np.zeros((1, int(WINDOW_PERIOD/DATA_SAMPLING_PERIOD)), dtype=np.float32)
 index = 0
 
 model = Scritch() #.cuda()
@@ -38,13 +38,16 @@ try:
             except:
                 continue
             index += 1
-            if index == int(INTERVAL/SAMPLING_PERIOD):
+            if index == int(INTERVAL/DATA_SAMPLING_PERIOD):
                 with torch.no_grad():
                     # logistic regression
                     # print(f'{model(torch.from_numpy(x)).item():.2f}, {"Are you scratching?" if model(torch.from_numpy(x)).item() > THRESHOLD else "Everything looks fine"}')
                     
                     # prob = F.softmax(model(torch.from_numpy(x)), dim=1)
-                    scratching = model(torch.from_numpy(proc_data(acc_x, acc_y, acc_z))).argmax(dim=1).item()
+                    scratching = model(torch.from_numpy(proc_data(acc_x[::DS_FACTOR], 
+                                                                  acc_y[::DS_FACTOR], 
+                                                                  acc_z[::DS_FACTOR]))
+                                       ).argmax(dim=1).item()
                     print("Are you scratching?" if scratching else "Everything looks fine")
                 
                 index = 0
