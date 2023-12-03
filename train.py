@@ -11,9 +11,11 @@ from utils import *
 config = {
   'device': torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
   'batch_size': 200,
-  'learning_rate': 1e-5,
+  'learning_rate': 3e-6,
+#   'learning_rate': 1e-5,
   'epochs': 100000,
-  'early_stop': 100,
+  'early_stop': 500,
+#   'early_stop': 100,
   'save_path': './models',
   'seed': 42,
   'log_step': 50
@@ -157,7 +159,7 @@ for epoch in range(n_epochs):
         #     100.0 * recall(saved_target, saved_preds)
         #     ))
         print('\n'.join(['', 
-                         'Epoch {:2d}, lr: {:.6f} Train Loss: {:.6f} Valid Loss: {:.6f} Valid Acc: {:.2f}%', 
+                         'Epoch {:2d}, lr: {:.2E} Train Loss: {:.6f} Valid Loss: {:.6f} Valid Acc: {:.2f}%', 
                          'Precision: {:.2f}%, Recall: {:.2f}%', 
                          '']).format(epoch+1,
                                      leaning_rate[-1],

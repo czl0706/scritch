@@ -3,16 +3,24 @@ import torch.nn as nn
 from torchsummary import summary
 from thop import profile
 
+### MODIFIABLE CONFIG ###
+
 DATA_SAMPLING_PERIOD = 3e-3
-MODEL_INPUT_PERIOD   = 1e-2 # 6e-3
+MODL_SAMPLING_PERIOD = 1e-2 # 6e-3
 
 WINDOW_PERIOD = 0.45
 STRIDE_PERIOD = 0.1
 
-WINDOW_LENGTH = int(WINDOW_PERIOD/MODEL_INPUT_PERIOD)
-STRIDE_LENGTH = int(STRIDE_PERIOD/MODEL_INPUT_PERIOD)
+### END OF MODIFIABLE CONFIG ###
 
-DS_FACTOR = int(MODEL_INPUT_PERIOD/DATA_SAMPLING_PERIOD)
+WINDOW_LENGTH = int(WINDOW_PERIOD/MODL_SAMPLING_PERIOD)
+STRIDE_LENGTH = int(STRIDE_PERIOD/MODL_SAMPLING_PERIOD)
+
+DS_FACTOR = int(MODL_SAMPLING_PERIOD/DATA_SAMPLING_PERIOD)
+
+assert WINDOW_LENGTH != 0
+assert STRIDE_LENGTH != 0
+assert DS_FACTOR != 0
 
 # WINDOW_PERIOD = 1.5
 # STRIDE_PERIOD = 0.1
@@ -62,8 +70,10 @@ class Scritch(nn.Module):
     super(Scritch, self).__init__()
 
     in_feat = WINDOW_LENGTH
-    net1_feat = 60
-    net2_feat = 30
+    # net1_feat = 60
+    # net2_feat = 30
+    net1_feat = 30
+    net2_feat = 15
 
     self.net1_1 = nn.Sequential(
         nn.Linear(in_feat, net1_feat),
@@ -85,9 +95,9 @@ class Scritch(nn.Module):
         nn.Linear(net2_feat, 2)
     )
 
-  def forward(self, x):
-    # split (B, 300) into 3 * (B, 100)
-    x, y, z = torch.chunk(x, 3, dim=1)
+  def forward(self, input):
+    # split (B, C) into 3 * (B, C/3)
+    x, y, z = torch.chunk(input, 3, dim=1)
     x = self.net1_1(x)
     y = self.net1_2(y)
     z = self.net1_3(z)

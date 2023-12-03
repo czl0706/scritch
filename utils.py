@@ -9,7 +9,8 @@ ds_list = ['./data/data1.csv',
            './data/data3.csv',
            './data/data4.csv',
            './data/data5.csv',
-           './data/data6.csv']
+           './data/data6.csv',
+           './data/data7.csv']
 
 def proc_data(feat_x, feat_y, feat_z):
     # feat_z = np.sign(feat_z) * (feat_z ** 2) / (feat_x ** 2 + feat_y ** 2 + feat_z ** 2)
