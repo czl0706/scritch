@@ -70,10 +70,10 @@ class Scritch(nn.Module):
     super(Scritch, self).__init__()
 
     in_feat = WINDOW_LENGTH
-    # net1_feat = 60
-    # net2_feat = 30
-    net1_feat = 30
-    net2_feat = 15
+    net1_feat = 20
+    net2_feat = 40
+    # net1_feat = 30
+    # net2_feat = 15
 
     self.net1_1 = nn.Sequential(
         nn.Linear(in_feat, net1_feat),
@@ -147,4 +147,5 @@ if __name__ == '__main__':
     summary(model, input_size=(in_shape,), device='cpu')
     macs, parm = profile(model, inputs=(torch.randn(1, in_shape), ))
     print(f'MACs: {int(macs)}, Params: {int(parm)}')
+    print(f'DATA_SAMPLING_PERIOD: {DATA_SAMPLING_PERIOD}, MODL_SAMPLING_PERIOD: {MODL_SAMPLING_PERIOD}, WINDOW_PERIOD: {WINDOW_PERIOD}, STRIDE_PERIOD: {STRIDE_PERIOD}')
     print(f'WINDOW_LENGTH: {WINDOW_LENGTH}, STRIDE_LENGTH: {STRIDE_LENGTH}, DS_FACTOR: {DS_FACTOR}')

@@ -73,9 +73,13 @@ def get_dataset() -> ScritchData:
     
 if __name__ == '__main__':
     dataset = get_dataset()
+    labels = [x for _, x in dataset]
+    pos, neg = np.sum(labels, axis=0).astype('int32')
+    
     print(f'Number of training data: {len(dataset)}')
+    print(f'Positive samples: {pos}, Negative samples: {neg}')  
     print(f'Input shape: {dataset[0][0].shape} Output shape: {dataset[0][1].shape}')
-
+    
     # test the shape of data is fit to model
     model = Scritch()
     model(torch.from_numpy(dataset[0][0]).unsqueeze(0))

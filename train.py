@@ -11,8 +11,8 @@ from utils import *
 config = {
   'device': torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
   'batch_size': 200,
-  'learning_rate': 3e-6,
-#   'learning_rate': 1e-5,
+#   'learning_rate': 3e-6,
+  'learning_rate': 1e-5,
   'epochs': 100000,
   'early_stop': 500,
 #   'early_stop': 100,
