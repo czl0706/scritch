@@ -83,14 +83,11 @@ void app_main(void) {
     }
 }
 
-void data_collection_task(void) {
+void data_collection_task(void *pvParameters) {
     acc_data_t accData;
 
     gpio_set_direction(BUTTON1, GPIO_MODE_INPUT);
     gpio_set_pull_mode(BUTTON1, GPIO_PULLUP_ONLY);
-
-    ESP_ERROR_CHECK(mpu6500_i2c_init());
-    ESP_LOGI(TAG, "I2C initialized successfully");
 
     printf("Start collection\n");
     

@@ -1,6 +1,6 @@
 # Scritch
 
-~~Deep learning is essentially part of digital signal processing~~
+~~Deep learning is essentially part of digital signal processing~~  
 ![😻](./assets/2lanem.jpg)
 
 ### Debugging esp-idf project on WSL 2
@@ -68,13 +68,20 @@ $ python ./test.py
 ### Model Structure
 ![Model structure](./assets/Scritch.onnx.png)
 
+### Inference on esp32
+Run `export_params.py` to export parameters.
+```pwsh
+$ python ./export_params.py
+```
+Then just use [`esp-dsp`](https://github.com/espressif/esp-dsp) to perform all NN operations.
+
 ### Quantization
-Check the weights of the trained model:  
-![Histogram of trained model's weights](./assets/hist.png)
+Just make this model small enough to operate on fp32.  
+~~Check the weights of the trained model:~~
+~~![Histogram of trained model's weights](./assets/hist.png)~~
 
 ### Converting and run on esp-dl framework
-
-It didn't work.
+It didn't work.  
 
 ~~Then follow the steps from [ESP-DL 用户指南](https://docs.espressif.com/projects/esp-dl/zh_CN/latest/esp32/tutorials/deploying-models-through-tvm.html#)~~
 
@@ -82,8 +89,8 @@ It didn't work.
 
 ### To-dos
 - [ ] Train model
-- [ ] Converting to tflite model
-- [ ] Deploy model to esp32
+~~- [ ] Converting to tflite model~~(I skipped this)
+- [x] Deploy model to esp32
 - [ ] Add BLE connectivity to esp32
 
 To be continued...  

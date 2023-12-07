@@ -1,6 +1,7 @@
 .vscode/
 data/
 archived/
+*.zip
 
 *.so
 
