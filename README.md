@@ -1,11 +1,10 @@
 # Scritch
 
-|@NYCU EE||  
-|---|---|
-|Course Name | Digital Signal Processing Laboratory |
----
-|Professor| 鄭耿璽、桑梓賢|  
-|Semester| Spring, 2023|  
+| @NYCU EE    |                                      |
+|-------------|--------------------------------------|
+| Course Name | Digital Signal Processing Laboratory |
+| Professor   | 鄭耿璽、桑梓賢                          |
+| Semester    | Spring, 2023                         |
 
 ~~Deep learning is essentially part of digital signal processing~~  
 ![😻](./assets/2lanem.jpg)
