@@ -1,6 +1,6 @@
 # Scritch
 
-| @NYCU EE    |                                      |
+| Department  | @NYCU EE                             |
 |-------------|--------------------------------------|
 | Course Name | Digital Signal Processing Laboratory |
 | Professor   | 鄭耿璽、桑梓賢                          |
