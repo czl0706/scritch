@@ -21,13 +21,69 @@
 #include "esp_timer.h"
 #include "driver/gpio.h"
 #include "mpu6500.h"
+#include "scritch_nn.h"
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
 
 static const char *TAG = "mpu6500-test";
 
 #define BUTTON1 19
+#define BUFFER_LEN 45 
 
-void app_main(void)
-{
+#define COLLECT_INTERVAL 10
+#define INFERENCE_COUNT 500 / COLLECT_INTERVAL
+
+float accX[BUFFER_LEN], accY[BUFFER_LEN], accZ[BUFFER_LEN], output[2];
+
+void detection_task(void *pvParameters) {
+    int count = 0;
+    acc_data_t accData;
+
+    while (1) {
+        // printf("%lld ", esp_timer_get_time() / 1000);
+        ESP_ERROR_CHECK(mpu6500_get_acc(&accData));
+        for (int i = 0; i < BUFFER_LEN - 1; i++) {
+            accX[i] = accX[i + 1];
+            accY[i] = accY[i + 1];
+            accZ[i] = accZ[i + 1];
+        }
+        accX[BUFFER_LEN - 1] = accData.accX;
+        accY[BUFFER_LEN - 1] = accData.accY;
+        accZ[BUFFER_LEN - 1] = accData.accZ;
+
+        count += 1;
+        if (count >= INFERENCE_COUNT) {
+            scritch_forward(accX, accY, accZ, output);
+            // printf("%lld ", esp_timer_get_time() / 1000);
+            // printf("%+f, %+f\n", output[0], output[1]);
+            printf("%d\n", output[1] > output[0]);
+            count = 0;
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(COLLECT_INTERVAL));
+    }
+}
+
+void app_main(void) {
+    scritch_init();
+    // measure the time of one forward pass
+    // printf("%lld ", esp_timer_get_time() / 1000);
+    // scritch_forward(accX, accY, accZ, output);
+    // printf("%lld \n", esp_timer_get_time() / 1000);
+
+    ESP_ERROR_CHECK(mpu6500_i2c_init());
+    ESP_LOGI(TAG, "I2C initialized successfully");
+
+    xTaskCreate(detection_task, "detection_task", 4096, NULL, 5, NULL);
+
+    while (1) {
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
+void data_collection_task(void) {
     acc_data_t accData;
 
     gpio_set_direction(BUTTON1, GPIO_MODE_INPUT);
@@ -36,22 +92,12 @@ void app_main(void)
     ESP_ERROR_CHECK(mpu6500_i2c_init());
     ESP_LOGI(TAG, "I2C initialized successfully");
 
-    /* Read the MPU6500 WHO_AM_I register, on power up the register should have the value 0x71 */
-    // ESP_ERROR_CHECK(mpu6500_register_read(MPU6500_WHO_AM_I_REG_ADDR, data, 1));
-    // ESP_LOGI(TAG, "WHO_AM_I = %X", data[0]);
-
-    /* Demonstrate writing by reseting the MPU6500 */
-    // ESP_ERROR_CHECK(mpu6500_register_write_byte(MPU6500_PWR_MGMT_1_REG_ADDR, 1 << MPU6500_RESET_BIT));
-
     printf("Start collection\n");
     
     while(true) {
         ESP_ERROR_CHECK(mpu6500_get_acc(&accData));
 
-        // printf("%lld ", esp_timer_get_time() / 1000);
         printf("%+f, %+f, %+f, %d\n", accData.accX, accData.accY, accData.accZ, !gpio_get_level(BUTTON1));
         vTaskDelay(pdMS_TO_TICKS(3));
     }
-
-    ESP_ERROR_CHECK(i2c_driver_delete(I2C_MASTER_NUM));
 }
