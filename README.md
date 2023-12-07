@@ -94,9 +94,13 @@ It didn't work.
 ~~[==](https://esp32.com/viewtopic.php?p=111753)~~
 
 ### To-dos
-- [ ] Train model
-~~- [ ] Converting to tflite model~~(I skipped this)
-- [x] Deploy model to esp32
+- [ ] Train model  
+- [ ] Modify model(use conv1d?)  
+- [x] Deploy model onto esp32
+- [ ] Apply DSP algs to make the prediction more stable
+- [ ] Detecting which part of the body is being scratched
+- [ ] Motion detection
 - [ ] Add BLE connectivity to esp32
+- [ ] Android App
 
 To be continued...  

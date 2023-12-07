@@ -8,18 +8,18 @@ static inline esp_err_t mpu6500_register_read(uint8_t reg_addr, uint8_t *data, s
     return i2c_master_write_read_device(I2C_MASTER_NUM, MPU6500_SENSOR_ADDR, &reg_addr, 1, data, len, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
 }
 
-/**
- * @brief Write a byte to a MPU6500 sensor register
- */
-static esp_err_t mpu6500_register_write_byte(uint8_t reg_addr, uint8_t data)
-{
-    int ret;
-    uint8_t write_buf[2] = {reg_addr, data};
+// /**
+//  * @brief Write a byte to a MPU6500 sensor register
+//  */
+// static esp_err_t mpu6500_register_write_byte(uint8_t reg_addr, uint8_t data)
+// {
+//     int ret;
+//     uint8_t write_buf[2] = {reg_addr, data};
 
-    ret = i2c_master_write_to_device(I2C_MASTER_NUM, MPU6500_SENSOR_ADDR, write_buf, sizeof(write_buf), I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
+//     ret = i2c_master_write_to_device(I2C_MASTER_NUM, MPU6500_SENSOR_ADDR, write_buf, sizeof(write_buf), I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
 
-    return ret;
-}
+//     return ret;
+// }
 
 /**
  * @brief i2c master initialization
