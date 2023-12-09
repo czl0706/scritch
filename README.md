@@ -72,19 +72,20 @@ $ python ./test.py
 ```
 
 ### Model Structure
-![Model structure](./assets/Scritch.onnx.png)
+![Model structure](./assets/model.onnx.svg)  
+MACs: 13860, Params: 8373 @WINDOW_LENGTH = 90
 
 ### Inference on esp32
 Run `export_params.py` to export parameters.
 ```pwsh
 $ python ./export_params.py
 ```
-Then just use [`esp-dsp`](https://github.com/espressif/esp-dsp) to perform all NN operations.
+Then just use [`esp-dsp library`](https://github.com/espressif/esp-dsp) to perform all NN operations.
 
 ### Quantization
 Just make this model small enough to operate on fp32.  
 ~~Check the weights of the trained model:~~
-~~![Histogram of trained model's weights](./assets/hist.png)~~
+<!-- ![Histogram of trained model's weights](./assets/hist.png) -->
 
 ### Converting and run on esp-dl framework
 It didn't work.  
