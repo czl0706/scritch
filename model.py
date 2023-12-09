@@ -8,7 +8,10 @@ from thop import profile
 DATA_SAMPLING_PERIOD = 3e-3
 MODL_SAMPLING_PERIOD = 1e-2 # 6e-3
 
-WINDOW_PERIOD = 0.45
+# WINDOW_PERIOD = 0.45
+# STRIDE_PERIOD = 0.1
+
+WINDOW_PERIOD = 0.9
 STRIDE_PERIOD = 0.1
 
 ### END OF MODIFIABLE CONFIG ###
@@ -72,8 +75,8 @@ class Scritch(nn.Module):
     in_feat = WINDOW_LENGTH
     net1_feat = 20
     net2_feat = 40
-    # net1_feat = 30
-    # net2_feat = 15
+    # net1_feat = 40
+    # net2_feat = 60
 
     self.net1_1 = nn.Sequential(
         nn.Linear(in_feat, net1_feat),
@@ -104,41 +107,32 @@ class Scritch(nn.Module):
 
     return self.net2(torch.cat((x, y, z), dim=1))
 
-# class Scritch(nn.Module):
-#   def __init__(self):
-#     super(Scritch, self).__init__()
+class Scritch(nn.Module):
+  def __init__(self):
+    super(Scritch, self).__init__()
 
-#     in_feat = WINDOW_LENGTH
-#     net1_feat = 40
-#     net2_feat = 80
+    in_feat = WINDOW_LENGTH // 2 * 4
+    
+    self.conv1 = nn.Conv1d(in_channels=3, out_channels=6, kernel_size=3, stride=2, padding=1, bias=True)
+    self.conv2 = nn.Conv1d(in_channels=6, out_channels=4, kernel_size=3, stride=1, padding=1, bias=True)
+    self.net1 = nn.Linear(in_feat, in_feat // 4)
+    self.net2 = nn.Linear(in_feat // 4, 2)
+    self.relu = nn.ReLU()
+    self.dropout = nn.Dropout(0.2)
 
-#     self.net1_1 = nn.Sequential(
-#         nn.Linear(in_feat, net1_feat),
-#         nn.ReLU(),
-#     )
-#     self.net1_2 = nn.Sequential(
-#         nn.Linear(in_feat, net1_feat),
-#         nn.ReLU(),
-#     )
-#     self.net1_3 = nn.Sequential(
-#         nn.Linear(in_feat, net1_feat),
-#         nn.ReLU(),
-#     )
-
-#     self.net2 = nn.Sequential(
-#         nn.Linear(net1_feat * 3, net2_feat),
-#         nn.ReLU(),
-#         nn.Linear(net2_feat, 2)
-#     )
-
-#   def forward(self, x):
-#     # split (B, 300) into 3 * (B, 100)
-#     x, y, z = torch.chunk(x, 3, dim=1)
-#     x = self.net1_1(x)
-#     y = self.net1_2(y)
-#     z = self.net1_3(z)
-
-#     return self.net2(torch.cat((x, y, z), dim=1))
+  def forward(self, x):
+    # (B, 3 * feat_size) -> (B, 3, feat_size)
+    x = x.view(-1, 3, WINDOW_LENGTH)
+    x = self.conv1(x)
+    x = self.relu(x)
+    x = self.conv2(x)
+    x = self.relu(x)
+    x = torch.flatten(x, start_dim=1)
+    x = self.dropout(x)
+    x = self.net1(x)  
+    x = self.relu(x)  
+    x = self.net2(x)    
+    return x
   
 if __name__ == '__main__':
     in_shape = WINDOW_LENGTH * 3

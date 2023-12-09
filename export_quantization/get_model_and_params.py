@@ -7,4 +7,4 @@ sys.path.append(
 from model import *
 
 torch_model_path = '../models/model.pt'
-onnx_save_path = './tvm/model.onnx'
+onnx_save_path = './model.onnx'

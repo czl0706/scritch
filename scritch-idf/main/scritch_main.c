@@ -13,7 +13,7 @@ static const char *TAG = "scritch-main";
 
 #define LABEL_BUTTON 19
 
-#define LED_BLINK 0
+#define LED_BLINK 1
 #define LED_PIN 2
 
 #define BUFFER_LENGTH 45 

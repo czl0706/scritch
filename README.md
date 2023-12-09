@@ -95,6 +95,8 @@ It didn't work.
 
 ### To-dos
 - [x] Add BLE connectivity to esp32
+- [ ] Collect more data
+- [ ] Use nimble instead
 - [ ] Modify model(use conv1d?)  
 - [ ] Train model  
 - [x] Deploy model onto esp32
