@@ -8,10 +8,7 @@ from thop import profile
 DATA_SAMPLING_PERIOD = 3e-3
 MODL_SAMPLING_PERIOD = 1e-2 # 6e-3
 
-# WINDOW_PERIOD = 0.45
-# STRIDE_PERIOD = 0.1
-
-WINDOW_PERIOD = 0.9
+WINDOW_PERIOD = 0.6
 STRIDE_PERIOD = 0.1
 
 ### END OF MODIFIABLE CONFIG ###
@@ -25,100 +22,19 @@ assert WINDOW_LENGTH != 0
 assert STRIDE_LENGTH != 0
 assert DS_FACTOR != 0
 
-# WINDOW_PERIOD = 1.5
-# STRIDE_PERIOD = 0.1
-
-# THRESHOLD = 0.5
-
-# # logistic regression
-# class Scritch(nn.Module):
-#   def __init__(self):
-#     super(Scritch, self).__init__()
-
-#     self.net = nn.Sequential(
-#       nn.Linear(WINDOW_LENGTH, 400),
-#       nn.ReLU(),
-#       nn.Linear(400, 80),
-#       nn.ReLU(),
-#       nn.Linear(80, 16),
-#       nn.ReLU(),
-#       nn.Linear(16, 1),
-#       nn.Sigmoid()
-#     )
-
-#   def forward(self, x):
-#     return self.net(x)
-
-# classification
-# class Scritch(nn.Module):
-#   def __init__(self):
-#     super(Scritch, self).__init__()
-
-#     self.net = nn.Sequential(
-#       nn.Linear(WINDOW_LENGTH, 400),
-#       nn.ReLU(),
-#       nn.Linear(400, 80),
-#       nn.ReLU(),
-#       nn.Linear(80, 16),
-#       nn.ReLU(),
-#       nn.Linear(16, 2),
-#     )
-
-#   def forward(self, x):
-#     return self.net(x)
-
-# 3-axis perception model
-class Scritch(nn.Module):
-  def __init__(self):
-    super(Scritch, self).__init__()
-
-    in_feat = WINDOW_LENGTH
-    net1_feat = 20
-    net2_feat = 40
-    # net1_feat = 40
-    # net2_feat = 60
-
-    self.net1_1 = nn.Sequential(
-        nn.Linear(in_feat, net1_feat),
-        nn.ReLU(),
-    )
-    self.net1_2 = nn.Sequential(
-        nn.Linear(in_feat, net1_feat),
-        nn.ReLU(),
-    )
-    self.net1_3 = nn.Sequential(
-        nn.Linear(in_feat, net1_feat),
-        nn.ReLU(),
-    )
-
-    self.net2 = nn.Sequential(
-        nn.Dropout(0.2),
-        nn.Linear(net1_feat * 3, net2_feat),
-        nn.ReLU(),
-        nn.Linear(net2_feat, 2)
-    )
-
-  def forward(self, input):
-    # split (B, C) into 3 * (B, C/3)
-    x, y, z = torch.chunk(input, 3, dim=1)
-    x = self.net1_1(x)
-    y = self.net1_2(y)
-    z = self.net1_3(z)
-
-    return self.net2(torch.cat((x, y, z), dim=1))
-
 class Scritch(nn.Module):
   def __init__(self):
     super(Scritch, self).__init__()
 
     in_feat = WINDOW_LENGTH // 2 * 4
     
-    self.conv1 = nn.Conv1d(in_channels=3, out_channels=6, kernel_size=3, stride=2, padding=1, bias=True)
+    self.conv1 = nn.Conv1d(in_channels=3, out_channels=6, kernel_size=5, stride=2, padding=2, bias=True)
     self.conv2 = nn.Conv1d(in_channels=6, out_channels=4, kernel_size=3, stride=1, padding=1, bias=True)
-    self.net1 = nn.Linear(in_feat, in_feat // 4)
-    self.net2 = nn.Linear(in_feat // 4, 2)
+    self.net1 = nn.Linear(in_feat, 20)
+    self.net2 = nn.Linear(20, 2)
     self.relu = nn.ReLU()
     self.dropout = nn.Dropout(0.2)
+    # self.dropout = nn.Dropout(0.3)
 
   def forward(self, x):
     # (B, 3 * feat_size) -> (B, 3, feat_size)
