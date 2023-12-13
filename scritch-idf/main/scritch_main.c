@@ -630,7 +630,7 @@ void app_main(void)
     ESP_ERROR_CHECK(mpu6500_i2c_init());
     ESP_LOGI(TAG, "I2C initialized successfully");
 
-    xTaskCreate(inference_task, "inference_task", 4096, NULL, 5, NULL);
+    // xTaskCreate(inference_task, "inference_task", 4096, NULL, 5, NULL);
 
     return;
 }

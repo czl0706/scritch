@@ -8,6 +8,8 @@ from torchmetrics.classification import Precision, Recall
 import os 
 from utils import *
 
+from torch.utils.tensorboard import SummaryWriter
+
 config = {
   'device': torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
   'batch_size': 200,
@@ -63,6 +65,8 @@ valid_acc_max = 0.0
 history = []
 
 early_stop_count = 0
+
+writer = SummaryWriter('./run')
 
 for epoch in range(n_epochs):
     # monitor training loss, validation loss and learning rate
@@ -148,7 +152,17 @@ for epoch in range(n_epochs):
     valid_acc = (100. * valid_acc) / valid_size
 
     saved_target, saved_preds = torch.vstack(saved_target), torch.vstack(saved_preds)
-
+    
+    precision_perc = 100.0 * precision(saved_preds, saved_target)
+    recall_perc = 100.0 * recall(saved_preds, saved_target)
+    
+    writer.add_scalar('Loss/train', train_loss, epoch)
+    writer.add_scalar('Loss/valid', valid_loss, epoch)
+    writer.add_scalar('Accuracy/valid', valid_acc, epoch)
+    writer.add_scalar('Precision/valid', precision_perc, epoch)
+    writer.add_scalar('Recall/valid', recall_perc, epoch)
+    writer.add_scalar('Learning Rate', leaning_rate[-1], epoch)
+    
     if (epoch+1) % log_step == 0:
         # print('\nEpoch {:2d}, lr: {:.6f} Train Loss: {:.6f} Valid Loss: {:.6f} Valid Acc: {:.2f}%\nPrecision: {:.2f}%, Recall: {:.2f}%\n'.format(
         #     epoch+1,
@@ -167,8 +181,8 @@ for epoch in range(n_epochs):
                                      train_loss,
                                      valid_loss,
                                      valid_acc,
-                                     100.0 * precision(saved_preds, saved_target), 
-                                     100.0 * recall(saved_preds, saved_target)))
+                                     precision_perc, 
+                                     recall_perc))
 
     # Apply early stopping and save model if validation loss has decreased
     # Use validation loss as the metric

@@ -3,6 +3,8 @@ data/
 archived/
 *.zip
 
+run/
+
 *.so
 
 models/*
