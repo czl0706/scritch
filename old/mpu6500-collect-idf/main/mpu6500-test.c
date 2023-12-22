@@ -43,7 +43,7 @@ static void collection_task(void *pvParameters) {
 #endif
         vTaskDelay(pdMS_TO_TICKS(3));
     }
-}
+}  
 
 void app_main(void) {
     led_init();

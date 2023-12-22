@@ -1,69 +1,67 @@
 import torch
 from torch.utils.data import Dataset
 import numpy as np
+from io import StringIO
 
 from model import *
 
-ds_list = ['./data/data1.csv', 
-           './data/data2.csv',
-           './data/data3.csv',
-           './data/data4.csv',
-           './data/data5.csv',
-           './data/data6.csv',
-           './data/data7.csv',
-        #    './data/data8.csv',
-           './data/data9.csv',
+# ds_list = ['./data/data1.csv', 
+#            './data/data2.csv',
+#            './data/data3.csv',
+#            './data/data4.csv',
+#            './data/data5.csv',
+#            './data/data6.csv',
+#            './data/data7.csv',
+#         #    './data/data8.csv',
+#            './data/data9.csv',
+#            ]
+
+ds_list = ['./data/data_1.txt',
+           './data/data_2.txt',
+           './data/data_3.txt',
            ]
 
+lbl_list = ['./data/label_1.txt',
+            './data/label_2.txt',
+            './data/label_3.txt',
+            ] 
+
 def proc_data(feat_x, feat_y, feat_z):
-    # feat_z = np.sign(feat_z) * (feat_z ** 2) / (feat_x ** 2 + feat_y ** 2 + feat_z ** 2)
     return np.hstack((feat_x, feat_y, feat_z))
 
 class ScritchData(Dataset):
-    def __init__(self, filenames):
-        arr = []
-        for filename in filenames:
-            arr.append(np.loadtxt(filename, delimiter=',', dtype=np.float32))
-            # print(arr[-1].shape)
-        arr = np.vstack(arr)
-        # print(arr.shape)
-        # z_data, label = arr[:, 2], arr[:, 3]
+    def __init__(self, ds_list, lbl_list):
+        x = []
+        for filename in ds_list:
+            with open(filename, 'r') as f:
+                x += f.readlines()
+                
+        size = len(x)
+        idx_list = [idx + 1 for idx, val in enumerate(x) if val == '\n']
+        res = [x[i: j] for i, j in
+            zip([0] + idx_list, idx_list +
+                ([size] if idx_list[-1] != size else []))]
         
-        # sampling
-        arr = arr.T[::, ::DS_FACTOR]
+        res = [''.join(x) for x in res]
         
-        # print(arr.shape)
+        # load res into numpy array
+        res = [np.genfromtxt(StringIO(x), delimiter=",") for x in res]
+        res = np.array(res)
         
-        x_data, y_data, z_data, label = arr #.T
+        # (1280, 50, 3) -> (1280, 3, 50)
+        res = np.transpose(res, (0, 2, 1))
+        
+        label = [np.loadtxt(x, dtype=np.float32) for x in lbl_list]
+        label = np.hstack(label)
+        label = label > 0.5
+        
+        label = np.eye(2)[label.astype('int32')]
+        
+        # print(res.shape)
+        # print(label.shape)
 
-        window = lambda m: np.lib.stride_tricks.as_strided(m, 
-                                                           strides = m.strides * 2, 
-                                                           shape = (m.size - WINDOW_LENGTH + 1, WINDOW_LENGTH)
-                                                           )[::STRIDE_LENGTH]
-
-        feat_x, feat_y, feat_z = window(x_data), window(y_data), window(z_data)
-        out_feat = np.sum(window(label), axis=1) > STRIDE_LENGTH//2
-        
-        # window = lambda m, w, o: np.lib.stride_tricks.as_strided(m, strides = m.strides * 2, shape = (m.size - w + 1, w))[::o]
-        # window_size, sliding_size = WINDOW_LENGTH, STRIDE_LENGTH
-
-        # feat_x = window(x_data)
-        # feat_y = window(y_data)
-        # feat_z = window(z_data)
-        # out_feat = np.sum(window(label, window_size, sliding_size),
-        #                   axis=1) > sliding_size//2
-        
-        # logistic regression
-        # out_feat = out_feat.astype('float32')
-        
-        # one hot encoding
-        # out_feat = F.one_hot(torch.from_numpy(out_feat.astype('float32')).long(), 2).float()
-
-        inp_feat = proc_data(feat_x, feat_y, feat_z)
-        out_feat = np.eye(2)[out_feat.astype('int32')]
-
-        self.inp_feat = inp_feat
-        self.out_feat = out_feat
+        self.inp_feat = res.astype('float32')
+        self.out_feat = label.astype('float32')
     
     def __len__(self):
         return len(self.out_feat)
@@ -72,12 +70,12 @@ class ScritchData(Dataset):
         return self.inp_feat[idx], self.out_feat[idx]
     
 def get_dataset() -> ScritchData:
-    return ScritchData(ds_list)
+    return ScritchData(ds_list, lbl_list)
     
 if __name__ == '__main__':
     dataset = get_dataset()
     labels = [x for _, x in dataset]
-    pos, neg = np.sum(labels, axis=0).astype('int32')
+    neg, pos = np.sum(labels, axis=0).astype('int32')
     
     print(f'Number of training data: {len(dataset)}')
     print(f'Positive samples: {pos}, Negative samples: {neg}')  
