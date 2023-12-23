@@ -12,7 +12,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 config = {
   'device': torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
-  'batch_size': 200,
+  'batch_size': 128,
 #   'learning_rate': 3e-6,
 #   'learning_rate': 1e-5,
   'learning_rate': 1e-4,
@@ -32,19 +32,15 @@ def set_seed(seed):
 
 set_seed(config['seed'])
     
-# full_dataset = ScritchData(['./data/data1.csv', 
-#                             './data/data2.csv',
-#                             './data/data3.csv',
-#                             './data/data4.csv',
-#                             './data/data5.csv',
-#                             './data/data6.csv'])
-
 full_dataset = get_dataset()
 
 train_ds, valid_ds = torch.utils.data.random_split(full_dataset, [0.7, 0.3])
 
 train_dl = DataLoader(train_ds, config['batch_size'], shuffle=True, drop_last=True, num_workers=0, pin_memory=True)
 valid_dl = DataLoader(valid_ds, config['batch_size'], shuffle=True, drop_last=True, num_workers=0, pin_memory=True)
+
+# print(f'Train size: {len(train_ds)}')
+# print(f'Valid size: {len(valid_ds)}')
   
 device, n_epochs, save_path, log_step, early_stop = \
     config['device'], config['epochs'], config['save_path'], config['log_step'], config['early_stop']
@@ -126,6 +122,7 @@ for epoch in range(n_epochs):
 
             # update running validation loss
             valid_loss += loss.item()*x.size(0)
+            valid_size += x.size(0)
 
             # pred = (output > THRESHOLD)
             # valid_acc += pred.eq(y).sum().item()
@@ -137,7 +134,6 @@ for epoch in range(n_epochs):
             saved_target.append(y.cpu())
             saved_preds.append(pred.cpu())
 
-            valid_size += x.size(0)
 
     # print training/validation statistics
     # calculate average loss over an epoch

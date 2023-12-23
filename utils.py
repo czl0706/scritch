@@ -16,39 +16,42 @@ from model import *
 #            './data/data9.csv',
 #            ]
 
-ds_list = ['./data/data_1.txt',
-           './data/data_2.txt',
+ds_list = [
+            './data/data_1.txt',
+            './data/data_2.txt',
            './data/data_3.txt',
            ]
 
-lbl_list = ['./data/label_1.txt',
+lbl_list = [
+            './data/label_1.txt',
             './data/label_2.txt',
             './data/label_3.txt',
             ] 
 
-def proc_data(feat_x, feat_y, feat_z):
-    return np.hstack((feat_x, feat_y, feat_z))
+# def proc_data(feat_x, feat_y, feat_z):
+#     return np.hstack((feat_x, feat_y, feat_z))
 
 class ScritchData(Dataset):
     def __init__(self, ds_list, lbl_list):
         x = []
+        res = []
         for filename in ds_list:
             with open(filename, 'r') as f:
-                x += f.readlines()
+                x = f.readlines()
                 
-        size = len(x)
-        idx_list = [idx + 1 for idx, val in enumerate(x) if val == '\n']
-        res = [x[i: j] for i, j in
-            zip([0] + idx_list, idx_list +
-                ([size] if idx_list[-1] != size else []))]
-        
-        res = [''.join(x) for x in res]
-        
-        # load res into numpy array
-        res = [np.genfromtxt(StringIO(x), delimiter=",") for x in res]
-        res = np.array(res)
+                size = len(x)
+                idx_list = [idx + 1 for idx, val in enumerate(x) if val == '\n']
+                tmp = [x[i: j] for i, j in
+                    zip([0] + idx_list, idx_list +
+                        ([size] if idx_list[-1] != size else []))]
+                
+                tmp = [''.join(x) for x in tmp]
+                
+                # load tmp into numpy array
+                res += [np.genfromtxt(StringIO(x), delimiter=",") for x in tmp]
         
         # (1280, 50, 3) -> (1280, 3, 50)
+        res = np.array(res)
         res = np.transpose(res, (0, 2, 1))
         
         label = [np.loadtxt(x, dtype=np.float32) for x in lbl_list]
