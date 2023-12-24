@@ -19,13 +19,13 @@ from model import *
 ds_list = [
             './data/data_1.txt',
             './data/data_2.txt',
-           './data/data_3.txt',
+            # './data/data_3.txt',
            ]
 
 lbl_list = [
             './data/label_1.txt',
             './data/label_2.txt',
-            './data/label_3.txt',
+            # './data/label_3.txt',
             ] 
 
 # def proc_data(feat_x, feat_y, feat_z):

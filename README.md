@@ -1,13 +1,13 @@
 # Scritch
 
-| Department  | @NYCU EE                             |
+<!-- | Department  | @NYCU EE                             |
 |-------------|--------------------------------------|
 | Course Name | Digital Signal Processing Laboratory |
 | Professor   | 鄭耿璽、桑梓賢                          |
 | Semester    | Spring, 2023                         |
 
 ~~Deep learning is essentially part of digital signal processing~~  
-![😻](./assets/2lanem.jpg)
+![😻](./assets/2lanem.jpg) -->
 
 ### Debugging esp-idf project on WSL 2
 First, install usbipd on the host(Windows):   
