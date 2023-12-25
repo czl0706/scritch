@@ -57,7 +57,7 @@ static int gatt_svr_chr_access_my_characteristic(uint16_t conn_handle,
 
     uuid = ble_uuid_u16(ctxt->chr->uuid);
 
-    if (uuid == 0x1234) {
+    if (uuid == MY_CHARACTERISTIC_UUID) {
         rc = os_mbuf_append(ctxt->om, &my_characteristic_value, 1);
 
         return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
@@ -114,11 +114,11 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
     {
         /* Service: MyService */
         .type = BLE_GATT_SVC_TYPE_PRIMARY,
-        .uuid = BLE_UUID16_DECLARE(0x7414),
+        .uuid = BLE_UUID16_DECLARE(GATT_MY_CHARACTERISTIC_UUID),
         .characteristics = (struct ble_gatt_chr_def[]) {
             {
                 /* Characteristic: MyCharacteristic */
-                .uuid = BLE_UUID16_DECLARE(0x1234),
+                .uuid = BLE_UUID16_DECLARE(MY_CHARACTERISTIC_UUID),
                 .access_cb = gatt_svr_chr_access_my_characteristic,
                 .val_handle = &my_characteristic_handle,
                 .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,

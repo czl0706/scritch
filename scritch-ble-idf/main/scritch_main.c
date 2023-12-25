@@ -13,14 +13,14 @@
 #include "math_utils.h"
 #include "ble_main.h"
 
-static const char *TAG = "scritch-test";
-static mpu6050_handle_t mpu6050 = NULL;
-
 #define WINDOW_SIZE 50
 #define STRIDE_SIZE 25
 
 #define OUTPUT_WINDOW_SIZE 5
 #define OUTPUT_THRESHOLD 3
+
+static const char *TAG = "scritch-test";
+static mpu6050_handle_t mpu6050 = NULL;
 
 float acc[WINDOW_SIZE][3];
 float acc_trans[WINDOW_SIZE * 3];
@@ -30,7 +30,7 @@ float acc_trans[WINDOW_SIZE * 3];
 
 SemaphoreHandle_t xAccDataSemaphore;
 
-static void collect_task()
+static void get_acc_task()
 {
     mpu6050_acce_value_t acce;
     // mpu6050_gyro_value_t gyro;
@@ -110,7 +110,7 @@ static void collect_task()
     }
 }
 
-static void transform_forward_task()
+static void trans_pred_task()
 {
     float acc_invNorm, rot_invNorm;
     float accX_norm = 0, accY_norm = 0, accZ_norm = 0;
@@ -180,7 +180,7 @@ static void transform_forward_task()
             bool scratching = count >= OUTPUT_THRESHOLD;
             
             printf("%d\n", scratching);
-            
+
             if (notify_state) {
                 update_my_characteristic_value(scratching);
             }
@@ -238,9 +238,9 @@ void app_main()
         printf("Failed to create semaphore\n");
     }
 
-    xTaskCreate(collect_task, "collect_task", 8192, NULL, 5, NULL);
+    xTaskCreate(get_acc_task, "get_acc_task", 8192, NULL, 5, NULL);
     vTaskDelay(pdMS_TO_TICKS(500));
-    xTaskCreate(transform_forward_task, "transform_forward_task", 8192, NULL, 5, NULL);
+    xTaskCreate(trans_pred_task, "trans_pred_task", 8192, NULL, 5, NULL);
 
     while (1)
     {
