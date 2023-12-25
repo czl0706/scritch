@@ -74,6 +74,8 @@ class Scritch(nn.Module):
     # x = self.conv2(x)
     # x = self.relu(x)
     x = torch.flatten(x, start_dim=1)
+    print(x)
+    
     x = self.dropout(x)
     x = self.net1(x)  
     x = self.relu(x)  
