@@ -9,7 +9,7 @@
 ~~Deep learning is essentially part of digital signal processing~~  
 ![😻](./assets/2lanem.jpg) -->
 
-### Debugging esp-idf project on WSL 2
+<!-- ### Debugging esp-idf project on WSL 2
 First, install usbipd on the host(Windows):   
 ```pwsh
 $ winget install usbipd
@@ -85,14 +85,13 @@ Then just use [`esp-dsp library`](https://github.com/espressif/esp-dsp) to perfo
 ### Quantization
 Just make this model small enough to operate on fp32.  
 ~~Check the weights of the trained model:~~
-<!-- ![Histogram of trained model's weights](./assets/hist.png) -->
 
 ### Converting and run on esp-dl framework
 It didn't work.  
 
 ~~Then follow the steps from [ESP-DL 用户指南](https://docs.espressif.com/projects/esp-dl/zh_CN/latest/esp32/tutorials/deploying-models-through-tvm.html#)~~
 
-~~[==](https://esp32.com/viewtopic.php?p=111753)~~
+~~[==](https://esp32.com/viewtopic.php?p=111753)~~ -->
 
 ### To-dos
 - [x] Add BLE connectivity to esp32
