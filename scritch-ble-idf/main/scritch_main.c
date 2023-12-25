@@ -19,6 +19,11 @@
 #define OUTPUT_WINDOW_SIZE 5
 #define OUTPUT_THRESHOLD 3
 
+#define USE_LED1_INDICATOR 1
+#define USE_LED2_INDICATOR 0
+#define LED1_PIN 12
+#define LED2_PIN 13
+
 static const char *TAG = "scritch-test";
 static mpu6050_handle_t mpu6050 = NULL;
 
@@ -29,6 +34,24 @@ float acc_trans[WINDOW_SIZE * 3];
 // float gyro_diff_buf[WINDOW_SIZE][3];
 
 SemaphoreHandle_t xAccDataSemaphore;
+
+static void led1_change_state(bool state) {
+    gpio_set_level(LED1_PIN, state);
+}
+
+static void led2_change_state(bool state) {
+    gpio_set_level(LED2_PIN, state);
+}
+
+static void led_init(void) {
+    gpio_reset_pin(LED1_PIN);
+    gpio_set_direction(LED1_PIN, GPIO_MODE_OUTPUT);
+    gpio_set_level(LED1_PIN, 0);
+
+    gpio_reset_pin(LED2_PIN);
+    gpio_set_direction(LED2_PIN, GPIO_MODE_OUTPUT);
+    gpio_set_level(LED2_PIN, 0);
+}
 
 static void get_acc_task()
 {
@@ -49,7 +72,7 @@ static void get_acc_task()
         }
     }
 
-    printf("Start\n");
+    // printf("Start\n");
     while (1)
     {
         ESP_ERROR_CHECK(mpu6050_get_acce(mpu6050, &acce));
@@ -118,9 +141,11 @@ static void trans_pred_task()
     float cos_rot_angle, sin_rot_angle;
     float rot_x, rot_y;
 
-    scritch_init(acc_trans);
+    bool scratching;
 
     uint16_t record = 0;
+
+    scritch_init(acc_trans);
 
     while (1)
     {
@@ -177,16 +202,22 @@ static void trans_pred_task()
                 tmp >>= 1;
             }
 
-            bool scratching = count >= OUTPUT_THRESHOLD;
+            scratching = count >= OUTPUT_THRESHOLD;
             
             printf("%d\n", scratching);
+
+            #if USE_LED1_INDICATOR
+                led1_change_state(scratching);
+            #endif
+
+            #if USE_LED2_INDICATOR
+                led2_change_state(scratching);
+            #endif
 
             if (notify_state) {
                 update_my_characteristic_value(scratching);
             }
             
-            // printf("%d\n", scritch_forward());
-
 
             // accX_norm = 0;
             // accY_norm = 0;
@@ -225,11 +256,13 @@ static void trans_pred_task()
 
 void app_main()
 {
-    uint8_t mpu6050_deviceid;
+    // uint8_t mpu6050_deviceid;
 
     mpu6050 = i2c_sensor_mpu6050_init();
 
-    mpu6050_get_deviceid(mpu6050, &mpu6050_deviceid);
+    // mpu6050_get_deviceid(mpu6050, &mpu6050_deviceid);
+
+    led_init();
 
     ble_main();
 
