@@ -1,0 +1,21 @@
+dependencies:
+  espressif/esp-dsp:
+    component_hash: 46498b4973097cac29cfc6a692abef44375ffb7b00b73b3f354124efc626a154
+    source:
+      service_url: https://api.components.espressif.com/
+      type: service
+    version: 1.4.10
+  espressif/mpu6050:
+    component_hash: d69219ccb141372b863c511749ffbeab28417ac71c205d7ed7030c308e1b6832
+    source:
+      service_url: https://api.components.espressif.com/
+      type: service
+    version: 1.2.0
+  idf:
+    component_hash: null
+    source:
+      type: idf
+    version: 5.1.2
+manifest_hash: 88d40edde003dd9313ba8eb2ae233dbbf9e0a6699dd31ee6088cc57d51d52409
+target: esp32c3
+version: 1.0.0
