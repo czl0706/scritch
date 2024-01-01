@@ -18,7 +18,6 @@ config = {
   'learning_rate': 1e-4,
   'epochs': 100000,
   'early_stop': 500,
-#   'early_stop': 100,
   'save_path': './models',
   'seed': 42,
   'log_step': 50
@@ -47,7 +46,6 @@ device, n_epochs, save_path, log_step, early_stop = \
 
 model = Scritch().to(device)
 
-# loss_func = nn.BCELoss()
 loss_func = nn.CrossEntropyLoss()
 optimizer = torch.optim.AdamW(model.parameters(), lr=config['learning_rate'])
 
@@ -160,15 +158,6 @@ for epoch in range(n_epochs):
     writer.add_scalar('Learning Rate', leaning_rate[-1], epoch)
     
     if (epoch+1) % log_step == 0:
-        # print('\nEpoch {:2d}, lr: {:.6f} Train Loss: {:.6f} Valid Loss: {:.6f} Valid Acc: {:.2f}%\nPrecision: {:.2f}%, Recall: {:.2f}%\n'.format(
-        #     epoch+1,
-        #     leaning_rate[-1],
-        #     train_loss,
-        #     valid_loss,
-        #     valid_acc,
-        #     100.0 * precision(saved_target, saved_preds),
-        #     100.0 * recall(saved_target, saved_preds)
-        #     ))
         print('\n'.join(['', 
                          'Epoch {:2d}, lr: {:.2E} Train Loss: {:.6f} Valid Loss: {:.6f} Valid Acc: {:.2f}%', 
                          'Precision: {:.2f}%, Recall: {:.2f}%', 

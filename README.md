@@ -65,7 +65,7 @@ To check the size of the model:
 $ python ./model.py 
 ```
 
-### Testing model on computer
+### Test model on computer
 Make sure that the pre-process procedure is consistent with the training steps.  
 ```pwsh
 $ python ./test.py
@@ -93,16 +93,55 @@ It didn't work.
 
 ~~[==](https://esp32.com/viewtopic.php?p=111753)~~ -->
 
+### Components used
+![Alt text](./assets/1.JPG)
+
+### Architecture
+![Alt text](./assets/2.JPG)
+![Alt text](./assets/3.JPG)
+
+### Model structure
+![Alt text](./assets/4.JPG)
+```
+----------------------------------------------------------------
+        Layer (type)               Output Shape         Param #
+================================================================
+            Conv1d-1                [-1, 6, 25]              96
+              ReLU-2                [-1, 6, 25]               0
+           Dropout-3                  [-1, 150]               0
+            Linear-4                   [-1, 30]           4,530
+              ReLU-5                   [-1, 30]               0
+            Linear-6                    [-1, 2]              62
+================================================================
+Total params: 4,688
+Trainable params: 4,688
+Non-trainable params: 0
+----------------------------------------------------------------
+Input size (MB): 0.00
+Forward/backward pass size (MB): 0.00
+Params size (MB): 0.02
+Estimated Total Size (MB): 0.02
+----------------------------------------------------------------
+```
+
+### System flow
+![Alt text](./assets/5.JPG)
+![Alt text](./assets/6.JPG)
+![Alt text](./assets/7.JPG)
+![Alt text](./assets/8.JPG)
+![Alt text](./assets/9.JPG)
+![Alt text](./assets/10.JPG)
+![Alt text](./assets/11.JPG)
+
 ### To-dos
 - [x] Add BLE connectivity to esp32
-- [ ] Collect more data
-- [ ] Use nimble instead
-- [ ] Modify model(use conv1d?)  
-- [ ] Train model  
+- [x] Use nimble instead
+- [x] Train model  
 - [x] Deploy model onto esp32
-- [ ] Apply DSP algs to make the prediction more stable
-- [ ] Detecting which part of the body is being scratched
+- [x] Apply DSP algs to make the prediction more stable
+<!-- - [ ] Detecting which part of the body is being scratched
+- [ ] Collect more data
 - [ ] Motion detection
 - [ ] Android App
 
-To be continued...  
+To be continued...   -->

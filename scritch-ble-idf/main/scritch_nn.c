@@ -33,10 +33,6 @@ static inline void relu_inplace(float *input, int size) {
     }
 } 
 
-// float conv1_output[150];
-// float fc1_output[30];
-// float fc2_output[2];
-
 static float *input_data;
 static float *conv1_output;
 static float *fc1_output;

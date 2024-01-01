@@ -5,17 +5,6 @@ from io import StringIO
 
 from model import *
 
-# ds_list = ['./data/data1.csv', 
-#            './data/data2.csv',
-#            './data/data3.csv',
-#            './data/data4.csv',
-#            './data/data5.csv',
-#            './data/data6.csv',
-#            './data/data7.csv',
-#         #    './data/data8.csv',
-#            './data/data9.csv',
-#            ]
-
 ds_list = [
             './data/data_1.txt',
             './data/data_2.txt',
@@ -27,9 +16,6 @@ lbl_list = [
             './data/label_2.txt',
             # './data/label_3.txt',
             ] 
-
-# def proc_data(feat_x, feat_y, feat_z):
-#     return np.hstack((feat_x, feat_y, feat_z))
 
 class ScritchData(Dataset):
     def __init__(self, ds_list, lbl_list):

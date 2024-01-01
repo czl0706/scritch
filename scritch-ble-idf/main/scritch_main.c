@@ -24,7 +24,7 @@
 #define LED1_PIN 12
 #define LED2_PIN 13
 
-static const char *TAG = "scritch-test";
+static const char *tag = "scritch-main";
 static mpu6050_handle_t mpu6050 = NULL;
 
 float acc[WINDOW_SIZE][3];
@@ -72,31 +72,19 @@ static void get_acc_task()
         }
     }
 
+    ESP_LOGI(tag, "Starting...\n");
     // printf("Start\n");
     while (1)
     {
         ESP_ERROR_CHECK(mpu6050_get_acce(mpu6050, &acce));
-        // ESP_ERROR_CHECK(mpu6050_get_gyro(mpu6050, &gyro));
 
         accX = acce.acce_y;
         accY = acce.acce_x;
         accZ = -acce.acce_z;
 
-        // gyroX = gyro.gyro_y;
-        // gyroY = gyro.gyro_x;
-        // gyroZ = -gyro.gyro_z;
-
         acc[idx][0] = accX;
         acc[idx][1] = accY;
         acc[idx][2] = accZ;
-
-        // gyro_diff[idx][0] = gyroX - gyroX_prev;
-        // gyro_diff[idx][1] = gyroY - gyroY_prev;
-        // gyro_diff[idx][2] = gyroZ - gyroZ_prev;
-
-        // gyroX_prev = gyroX;
-        // gyroY_prev = gyroY;
-        // gyroZ_prev = gyroZ;
 
         idx++;
         stride_count++;
@@ -107,7 +95,6 @@ static void get_acc_task()
             for (int i = 0; i < WINDOW_SIZE; i++) {
                 for (int j = 0; j < 3; j++) {
                     acc_trans[i + j * 50] = acc[i][j];
-                    // gyro_diff_buf[i][j] = gyro_diff[i][j];
                 }
             }
             xSemaphoreGive(xAccDataSemaphore);
@@ -202,9 +189,10 @@ static void trans_pred_task()
                 tmp >>= 1;
             }
 
-            scratching = count >= OUTPUT_THRESHOLD;
+            scratching = (count >= OUTPUT_THRESHOLD);
             
-            printf("%d\n", scratching);
+            ESP_LOGI(tag, "Status: %d\n", scratching);
+            // printf("%d\n", scratching);
 
             #if USE_LED1_INDICATOR
                 led1_change_state(scratching);
@@ -268,14 +256,15 @@ void app_main()
 
     xAccDataSemaphore = xSemaphoreCreateBinary();
     if (xAccDataSemaphore == NULL) {
-        printf("Failed to create semaphore\n");
+        ESP_LOGW(tag, "Failed to create semaphore\n");
+        // printf("Failed to create semaphore\n");
     }
 
     xTaskCreate(get_acc_task, "get_acc_task", 8192, NULL, 5, NULL);
     vTaskDelay(pdMS_TO_TICKS(500));
     xTaskCreate(trans_pred_task, "trans_pred_task", 8192, NULL, 5, NULL);
 
-    while (1)
+    while (1) 
     {
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
